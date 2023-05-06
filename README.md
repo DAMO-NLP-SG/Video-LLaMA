@@ -1,2 +1,2 @@
-# Video-LLaMA
-Video-LLaMA: A Video-Language Instruction-following Large Language Model 
+# Video-Vicuna
+Video-Vicuna: A Video-Grounded Instruction-Following Large Language Model 
