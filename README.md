@@ -19,10 +19,33 @@ Continuously upgrading, stay tuned for more updates!
 - After pre-training, we further fine-tune our Video-LLaMA using the image-based instruction-tuning data from [MiniGPT-4](https://github.com/Vision-CAIR/MiniGPT-4) and [LLaVA](https://github.com/haotian-liu/LLaVA).  
 - Note that only the newly added layers and linear projection layer are trainable in both pre-training and instruction-tuning stages, such components serve as the "adapter" between video representations and text representations. 
 
+## Example
+
+<div align="center">
+<img src="figs/demo.gif">
+</div>
+
+## Trained Checkpoint Release
+
+The checkpoint stores only learnable parameters (frame embeddings, one two-layer transformer block and one linear projection layer)
+| Checkpoint       | Link | Note |
+|:------------|-------------|-------------|
+| s1_pretrain_v1_13B    | [link](https://drive.google.com/file/d/18zt4N2pcdp2fUkLV5RbWq7qcvLAz8I3l/view?usp=sharing)       | Pre-trained on WebVid (2.5M video-caption pairs) |
+| s2_image_instruct_tune_13B | [link](https://drive.google.com/file/d/18zt4N2pcdp2fUkLV5RbWq7qcvLAz8I3l/view?usp=sharing) | Instruction-tuned on MiniGPT4-image-text-align dataset |
+
+## Usage
+### Enviroment Preparation 
+
+First, you should create a conda environment:
+```
+conda env create -f environment.yml
+conda activate videollama
+```
+
 
 ## Prerequisite Checkpoints
 
-Before using the repository, make sure to download the following checkpoints:
+Before using the repository, make sure you have obtained the following checkpoints:
 - Get the original LLaMA weights in the huggingface format by following the instructions [here](https://huggingface.co/docs/transformers/main/model_doc/llama).
 - Download [Vicuna delta weights](https://huggingface.co/lmsys/vicuna-13b-delta-v0). 
 - Use the following command to add delta weights to the original LLaMA weights to obtain the Vicuna weights.
@@ -35,6 +58,53 @@ python apply_delta.py \
 
 - Download the MiniGPT-4 model (trained linear layer) from this [link](https://drive.google.com/file/d/1a4zLvaiDBr-36pasffmgpvH5P7CKmpze/view).
 
+## How to Run Demo Locally
+
+Firstly, set the `llama_model` and `ckpt` in [eval_configs/video_llama_eval.yaml](./eval_configs/video_llama_eval.yaml).
+Then run the script
+```
+python demo.py \
+    --cfg-path eval_configs/video_llama_eval.yaml  --gpu-id 0
+```
+
+## Training
+
+The training of Video-LLaMA consists of two phases,
+
+1. Pre-training on Webvid-2M video caption dataset with a video-to-text generation task.
+
+2. Fine-tuning using the image-based instruction-tuning data from MiniGPT-4.
+
+### 1. Pre-training
+#### Data Preparation
+Download the metadata and video following the instruction from the official Github repo of [Webvid](https://github.com/m-bain/webvid).
+The folder structure of the dataset is shown below:
+```
+|webvid_train_data
+|──filter_annotation
+|────0.tsv
+|──videos
+|────000001_000050
+|──────1066674784.mp4
+```
+#### Script
+Config the the checkpoint and dataset paths in [video_llama_stage1_pretrain.yaml](./train_configs/video_llama_stage1_pretrain.yaml)
+Run the script:
+```
+conda activate videollama
+torchrun --nproc_per_node=8 train.py --cfg-path  ./train_configs/video_llama_stage1_pretrain.yaml
+```
+
+### 2. Fine-tuning
+#### Data Download 
+Refer to the instuction in MiniGPT4 repo: [link](https://github.com/Vision-CAIR/MiniGPT-4/blob/main/dataset/README_2_STAGE.md)
+
+#### Script
+Config the the checkpoint and dataset paths in [video_llama_stage2_finetune.yaml](./train_configs/video_llama_stage2_finetune.yaml)
+```
+conda activate videollama
+torchrun --nproc_per_node=8 train.py --cfg-path  ./train_configs/video_llama_stage1_pretrain.yaml
+```
 
 ## Acknowledgement
 We are grateful for the following awesome projects our Video-LLaMA arising from:
@@ -44,3 +114,15 @@ We are grateful for the following awesome projects our Video-LLaMA arising from:
 * [EVA-CLIP](https://github.com/baaivision/EVA/tree/master/EVA-CLIP): Improved Training Techniques for CLIP at Scale
 * [LLaVA](https://github.com/haotian-liu/LLaVA): Large Language and Vision Assistant
 * [LLaMA](https://github.com/facebookresearch/llama): Open and Efficient Foundation Language Models
+
+## Citation
+If you find our project useful, please cite the repo as follows:
+```
+@software{damonlpsg2023videollama,
+  author = {Zhang, Hang and Li, Xin and Bing, Lidong},
+  title = {Video-LLaMA: An Instruction-Finetuned Visual Language Model for Video Understanding},
+  year = 2023,
+  url = {https://github.com/DAMO-NLP-SG/Video-LLaMA}
+}
+```
+
