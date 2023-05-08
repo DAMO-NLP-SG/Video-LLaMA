@@ -2,8 +2,8 @@
 <a target="_blank"><img src="figs/top_logo.png" alt="Video-LLaMA" style="width: 50%; min-width: 200px; display: block; margin: auto;"></a>
 </p>
 
-# Video-LLaMA: A Video-Grounded Instruction-Following Large Language Model
-<!-- **Video-LLaMA: A Video-Grounded Instruction-Following Large Language Model** -->
+# Video-LLaMA: An Instruction-Finetuned Visual Language Model for Video Understanding
+<!-- **Video-LLaMA: An Instruction-Finetuned Visual Language Model for Video Understanding** -->
 
 This is the repo for the Video-LLaMA project, which is working on empowering large language models with video understanding capability. 
 
