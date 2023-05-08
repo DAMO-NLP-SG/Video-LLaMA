@@ -1,5 +1,5 @@
 <p align="center" width="100%">
-<a target="_blank"><img src="figs/top_logo.png" alt="Video-LLaMA" style="width: 50%; min-width: 200px; display: block; margin: auto;"></a>
+<a target="_blank"><img src="figs/video_llama_logo.png" alt="Video-LLaMA" style="width: 50%; min-width: 200px; display: block; margin: auto;"></a>
 </p>
 
 # Video-LLaMA: An Instruction-Finetuned Visual Language Model for Video Understanding
