@@ -16,7 +16,7 @@ Continuously upgrading, stay tuned for more updates!
 
 
 - Video-LLaMA is built on top of awesome [MiniGPT-4](https://github.com/Vision-CAIR/MiniGPT-4) (visual encoder: BLIP-2+Q-Former, language decoder: Vicuna-13B). 
-- We introduce a two-layer transformer and frame embeddings (added to the query tokens of each frame) to make the visual encoder of MiniGPT-4 capable to process video input. 
+- We introduce a two-layer video-Q-Former and frame embeddings (added to the query tokens of each frame) to make the visual encoder of MiniGPT-4 capable to process video input. 
 - To enable Vicuna-13B to understand video representations, we pre-train the Video-LLaMA on Webvid-2M video caption dataset with a video-to-text generation task.
 - After pre-training, we further fine-tune our Video-LLaMA using the image-based instruction-tuning data from [MiniGPT-4](https://github.com/Vision-CAIR/MiniGPT-4) and [LLaVA](https://github.com/haotian-liu/LLaVA).  
 - Note that only the newly added layers and linear projection layer are trainable in both pre-training and instruction-tuning stages, such components serve as the "adapter" between video representations and text representations. 
