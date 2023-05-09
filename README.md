@@ -21,7 +21,7 @@ Continuously upgrading, stay tuned for more updates!
 - After pre-training, we further fine-tune our Video-LLaMA using the image-based instruction-tuning data from [MiniGPT-4](https://github.com/Vision-CAIR/MiniGPT-4) and [LLaVA](https://github.com/haotian-liu/LLaVA).  
 - Note that only the newly added layers and linear projection layer are trainable in both pre-training and instruction-tuning stages, such components serve as the "adapter" between video representations and text representations. 
 <p align="center" width="100%">
-<a target="_blank"><img src="figs/architecture.png" alt="Video-LLaMA" style="width: 100%; min-width: 200px; display: block; margin: auto;"></a>
+<a target="_blank"><img src="figs/architecture.png" alt="Video-LLaMA" style="width: 80%; min-width: 200px; display: block; margin: auto;"></a>
 </p>
 
 
