@@ -1,0 +1,6 @@
+datasets:
+  webvid:
+    data_type: video
+    build_info:
+      anno_dir: path/webvid/webvid_tain_data/annotations/
+      videos_dir: path//webvid/webvid_tain_data/videos/

@@ -1,0 +1,70 @@
+model:
+  arch: video_llama
+  model_type: pretrain_vicuna
+  freeze_vit: True
+  freeze_qformer: True
+
+
+  # Q-Former
+  num_query_token: 32
+
+  # Vicuna
+  llama_model: "ckpt/vicuna-13b/"
+
+  # llama project 
+  frozen_llama_proj: False
+  llama_proj_model: 'ckpt/pretrained_minigpt4.pth'
+
+  fusion_head_layers: 2
+  max_frame_pos: 32
+  fusion_header_type: "seqTransf"
+
+  max_txt_len: 160
+  end_sym: "###"
+  prompt_path: "prompts/alignment_video.txt"
+  prompt_template: '###Human: {} ###Assistant: '
+  ckpt: 'path/pretrained_ckpt'
+
+  
+
+datasets:
+    cc_sbu_align:
+      vis_processor:
+        train:
+          name: "blip2_image_train"
+          image_size: 224
+      text_processor:
+        train:
+          name: "blip_caption"
+      sample_ratio: 1
+
+
+run:
+  task: video_text_pretrain
+  # optimizer
+  lr_sched: "linear_warmup_cosine_lr"
+  init_lr: 3e-5
+  min_lr: 1e-5
+  warmup_lr: 1e-6
+
+  weight_decay: 0.05
+  max_epoch: 5
+  iters_per_epoch: 1000
+  batch_size_train: 4
+  batch_size_eval: 4
+  num_workers: 4
+  warmup_steps: 1000
+
+  seed: 42
+  output_dir: "output/video_llama_stage2_finetune"
+
+  amp: True
+  resume_ckpt_path: null
+
+  evaluate: False 
+  train_splits: ["train"]
+
+  device: "cuda"
+  world_size: 1
+  dist_url: "env://"
+  distributed: True

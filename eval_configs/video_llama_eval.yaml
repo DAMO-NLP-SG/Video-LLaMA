@@ -1,0 +1,34 @@
+model:
+  arch: video_llama
+  model_type: pretrain_vicuna
+  freeze_vit: True
+  freeze_qformer: True
+  max_txt_len: 160
+  end_sym: "###"
+  low_resource: True
+
+  frozen_llama_proj: False
+
+  llama_model: "ckpt/vicuna-13b/"
+  llama_proj_model: 'ckpt/pretrained_minigpt4.pth'
+
+  fusion_head_layers: 2
+  max_frame_pos: 32
+  fusion_header_type: "seqTransf"
+
+  ckpt: '/path/to/pretrained/ckpt/'
+
+
+datasets:
+  webvid:
+    vis_processor:
+      train:
+        name: "alpro_video_eval"
+        n_frms: 8
+        image_size: 224
+    text_processor:
+      train:
+        name: "blip_caption"
+
+run:
+  task: video_text_pretrain

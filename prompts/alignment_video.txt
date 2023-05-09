@@ -1,0 +1,4 @@
+<Vision><ImageHere></Vision> Describe this image/video in detail.
+<Vision><ImageHere></Vision> Take a look at this image/video and describe what you notice.
+<Vision><ImageHere></Vision> Please provide a detailed description of the image/video.
+<Vision><ImageHere></Vision> Could you describe the contents of this image/video for me?
