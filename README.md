@@ -118,8 +118,9 @@ We are grateful for the following awesome projects our Video-LLaMA arising from:
 * [FastChat](https://github.com/lm-sys/FastChat): An Open Platform for Training, Serving, and Evaluating Large Language Model based Chatbots
 * [BLIP-2](https://github.com/salesforce/LAVIS/tree/main/projects/blip2): Bootstrapping Language-Image Pre-training with Frozen Image Encoders and Large Language Models 
 * [EVA-CLIP](https://github.com/baaivision/EVA/tree/master/EVA-CLIP): Improved Training Techniques for CLIP at Scale
-* [LLaVA](https://github.com/haotian-liu/LLaVA): Large Language and Vision Assistant
 * [LLaMA](https://github.com/facebookresearch/llama): Open and Efficient Foundation Language Models
+* [LLaVA](https://github.com/haotian-liu/LLaVA): Large Language and Vision Assistant
+* [WebVid](https://github.com/m-bain/webvid): A Large-scale Video-Text dataset
 
 ## Citation
 If you find our project useful, please cite the repo as follows:
