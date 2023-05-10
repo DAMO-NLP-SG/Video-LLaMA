@@ -132,7 +132,7 @@ We are grateful for the following awesome projects our Video-LLaMA arising from:
 * [LLaMA](https://github.com/facebookresearch/llama): Open and Efficient Foundation Language Models
 * [LLaVA](https://github.com/haotian-liu/LLaVA): Large Language and Vision Assistant
 * [WebVid](https://github.com/m-bain/webvid): A Large-scale Video-Text dataset
-* [mPLUG-Owl]([https://github.com/m-bain/webvid](https://github.com/X-PLUG/mPLUG-Owl/tree/main)): Modularization Empowers Large Language Models with Multimodality
+* [mPLUG-Owl](https://github.com/X-PLUG/mPLUG-Owl/tree/main): Modularization Empowers Large Language Models with Multimodality.
 
 ## Citation
 If you find our project useful, please cite the repo as follows:
