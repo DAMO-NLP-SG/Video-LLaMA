@@ -2,6 +2,9 @@
 <a target="_blank"><img src="figs/video_llama_logo.jpg" alt="Video-LLaMA" style="width: 50%; min-width: 200px; display: block; margin: auto;"></a>
 </p>
 
+
+
+
 # Video-LLaMA: An Instruction-Finetuned Visual Language Model for Video Understanding
 <!-- **Video-LLaMA: An Instruction-Finetuned Visual Language Model for Video Understanding** -->
 
@@ -26,6 +29,7 @@ Continuously upgrading, stay tuned for more updates!
 
 
 ## Example
+https://github.com/DAMO-NLP-SG/Video-LLaMA/assets/21003563/6fce2b2b-4ac1-4b12-81af-e4a3deb7930f
 
 
 ## Trained Checkpoint Release
