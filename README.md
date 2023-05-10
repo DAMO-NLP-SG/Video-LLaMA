@@ -17,7 +17,7 @@ Continuously upgrading, stay tuned for more updates!
 
 - Video-LLaMA is built on top of awesome [MiniGPT-4](https://github.com/Vision-CAIR/MiniGPT-4) (image encoder: ViT-G/14+Q-Former, language decoder: Vicuna-13B). 
 - We introduce a two-layer video Q-Former and a frame embedding layer (applied to the query tokens of each frame) to make the image encoder of MiniGPT-4 capable to process video input. 
-- To enable Vicuna-13B to understand video representations, we pre-train the Video-LLaMA on Webvid-2M video caption dataset with a video-to-text generation task. We also add image-text pairs (~595K image captions from [LLaVA](https://github.com/haotian-liu/LLaVA)) into pre-training dataset to enhance the understanding of static visual concepts.
+- To enable Vicuna-13B to understand video representations, we pre-train the Video-LLaMA on the Webvid-2M video caption dataset with a video-to-text generation task. We also add image-text pairs (~595K image captions from [LLaVA](https://github.com/haotian-liu/LLaVA)) into the pre-training dataset to enhance the understanding of static visual concepts.
 - After pre-training, we further fine-tune our Video-LLaMA using the image-based instruction-tuning data from [MiniGPT-4](https://github.com/Vision-CAIR/MiniGPT-4).  
 - Note that only the newly added layers and linear projection layer are trainable in both pre-training and instruction-tuning stages, such components serve as the "adapter" between video representations and text representations. 
 <p align="center" width="100%">
@@ -77,7 +77,7 @@ python demo.py \
 
 The training of Video-LLaMA consists of two phases,
 
-1. Pre-training on Webvid-2M video caption dataset with a video-to-text generation task.
+1. Pre-training on the Webvid-2M video caption dataset with a video-to-text generation task.
 
 2. Fine-tuning using the image-based instruction-tuning data from MiniGPT-4.
 
