@@ -36,9 +36,20 @@ datasets:
     text_processor:
       train:
         name: "blip_caption"
+  sample_ratio: 100
 
-
-
+  cc_sbu_align:
+    data_type: images
+    build_info:
+      storage: /path/LLaVA_cc3m
+    vis_processor:
+      train:
+        name: "blip2_image_train"
+        image_size: 224
+    text_processor:
+      train:
+        name: "blip_caption"
+    sample_ratio: 24
 
 run:
   task: video_text_pretrain
