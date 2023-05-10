@@ -1,5 +1,5 @@
 <p align="center" width="100%">
-<a target="_blank"><img src="figs/video_llama_logo.png" alt="Video-LLaMA" style="width: 50%; min-width: 200px; display: block; margin: auto;"></a>
+<a target="_blank"><img src="figs/video_llama_logo.jpg" alt="Video-LLaMA" style="width: 50%; min-width: 200px; display: block; margin: auto;"></a>
 </p>
 
 # Video-LLaMA: An Instruction-Finetuned Visual Language Model for Video Understanding
@@ -36,7 +36,7 @@ Continuously upgrading, stay tuned for more updates!
 The checkpoint stores only learnable parameters (frame embeddings, one two-layer transformer block and one linear projection layer)
 | Checkpoint       | Link | Note |
 |:------------|-------------|-------------|
-| s1_pretrain_v1_13B (**recommended**)    | [link](https://drive.google.com/file/d/18zt4N2pcdp2fUkLV5RbWq7qcvLAz8I3l/view?usp=sharing)       | Pre-trained on WebVid (2.5M video-caption pairs) |
+| s1_pretrain_v1_13B (**recommended**)    | [link]([https://drive.google.com/file/d/18zt4N2pcdp2fUkLV5RbWq7qcvLAz8I3l/view?usp=sharing](https://drive.google.com/file/d/15hqyM-2iMi-4zqLSb57IpsAMByEv0-va/view?usp=sharing))       | Pre-trained on WebVid (2.5M video-caption pairs) and LLaVA-CC3M (595k image-caption pairs) |
 | s2_image_instruct_tune_13B | [link](https://drive.google.com/file/d/18zt4N2pcdp2fUkLV5RbWq7qcvLAz8I3l/view?usp=sharing) | Instruction-tuned on MiniGPT4-image-text-align dataset |
 
 ## Usage
@@ -77,7 +77,7 @@ python demo.py \
 
 The training of Video-LLaMA consists of two phases,
 
-1. Pre-training on the Webvid-2M video caption dataset with a video-to-text generation task.
+1. Pre-training on the Webvid-2.5M video caption dataset and LLaVA-CC3M image caption dataset.
 
 2. Fine-tuning using the image-based instruction-tuning data from MiniGPT-4.
 
@@ -92,6 +92,13 @@ The folder structure of the dataset is shown below:
 |──videos
 |────000001_000050
 |──────1066674784.mp4
+```
+```
+|cc3m
+|──filter_cap.json
+|──image
+|────GCC_train_000000000.jpg
+|────...
 ```
 #### Script
 Config the the checkpoint and dataset paths in [video_llama_stage1_pretrain.yaml](./train_configs/video_llama_stage1_pretrain.yaml)
