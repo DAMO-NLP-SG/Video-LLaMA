@@ -27,9 +27,6 @@ Continuously upgrading, stay tuned for more updates!
 
 ## Example
 
-<div align="center">
-<img src="figs/demo.gif">
-</div>
 
 ## Trained Checkpoint Release
 
