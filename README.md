@@ -36,7 +36,7 @@ Continuously upgrading, stay tuned for more updates!
 The checkpoint stores only learnable parameters (frame embeddings, one two-layer transformer block and one linear projection layer)
 | Checkpoint       | Link | Note |
 |:------------|-------------|-------------|
-| s1_pretrain_v1_13B    | [link](https://drive.google.com/file/d/18zt4N2pcdp2fUkLV5RbWq7qcvLAz8I3l/view?usp=sharing)       | Pre-trained on WebVid (2.5M video-caption pairs) |
+| s1_pretrain_v1_13B (**recommended**)    | [link](https://drive.google.com/file/d/18zt4N2pcdp2fUkLV5RbWq7qcvLAz8I3l/view?usp=sharing)       | Pre-trained on WebVid (2.5M video-caption pairs) |
 | s2_image_instruct_tune_13B | [link](https://drive.google.com/file/d/18zt4N2pcdp2fUkLV5RbWq7qcvLAz8I3l/view?usp=sharing) | Instruction-tuned on MiniGPT4-image-text-align dataset |
 
 ## Usage
