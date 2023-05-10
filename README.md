@@ -29,9 +29,11 @@ Continuously upgrading, stay tuned for more updates!
 
 
 ## Example
-<div align="center">
-<img src="figs/birthday_demo.gif">
-</div>
+
+
+https://github.com/DAMO-NLP-SG/Video-LLaMA/assets/21003563/9a34cfb0-cb97-43ec-8737-a071eb038fe2
+
+
 
 ## Trained Checkpoint Release
 
