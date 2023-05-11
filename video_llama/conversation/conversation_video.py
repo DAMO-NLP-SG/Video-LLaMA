@@ -121,8 +121,8 @@ CONV_VISION = Conversation(
 )
 
 default_conversation = Conversation(
-    system="Give the following image/video: <Vision>VisionContent</Vision>. "
-           "You will be able to see the image/video once I provide it to you. Please answer my questions.",
+    system="Give the following media: <Media>VisionContent</Media>.  "
+           "You will be able to see the media once I provide it to you, Focus on the dynamic information if it is a video. Please answer my questions.",
     roles=("Human", "Assistant"),
     messages=[],
     offset=0,
