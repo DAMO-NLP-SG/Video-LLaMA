@@ -40,8 +40,8 @@ https://github.com/DAMO-NLP-SG/Video-LLaMA/assets/21003563/9a34cfb0-cb97-43ec-87
 The checkpoint stores only learnable parameters (frame embeddings, one two-layer transformer block and one linear projection layer)
 | Checkpoint       | Link | Note |
 |:------------|-------------|-------------|
-| s1_pretrain_v1_13B (**recommended**)    | [link](https://drive.google.com/file/d/18zt4N2pcdp2fUkLV5RbWq7qcvLAz8I3l/view?usp=sharing](https://drive.google.com/file/d/15hqyM-2iMi-4zqLSb57IpsAMByEv0-va/view?usp=sharing))       | Pre-trained on WebVid (2.5M video-caption pairs) and LLaVA-CC3M (595k image-caption pairs) |
-| s2_image_instruct_tune_13B | [link](https://drive.google.com/file/d/18zt4N2pcdp2fUkLV5RbWq7qcvLAz8I3l/view?usp=sharing) | Instruction-tuned on MiniGPT4-image-text-align dataset |
+| s1_pretrain_v1_13B (**recommended**)    | [link](https://drive.google.com/file/d/15hqyM-2iMi-4zqLSb57IpsAMByEv0-va/view?usp=sharing)       | Pre-trained on WebVid (2.5M video-caption pairs) and LLaVA-CC3M (595k image-caption pairs) |
+| s2_image_instruct_tune_13B | [link](https://drive.google.com/file/d/15hqyM-2iMi-4zqLSb57IpsAMByEv0-va/view?usp=sharing) | Instruction-tuned on MiniGPT4-image-text-align dataset |
 
 ## Usage
 ### Enviroment Preparation 
