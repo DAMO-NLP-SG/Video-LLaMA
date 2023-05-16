@@ -73,7 +73,7 @@ python apply_delta.py \
 Firstly, set the `llama_model` and `ckpt` in [eval_configs/video_llama_eval.yaml](./eval_configs/video_llama_eval.yaml).
 Then run the script
 ```
-python demo.py \
+python demo_video.py \
     --cfg-path eval_configs/video_llama_eval.yaml  --gpu-id 0
 ```
 
