@@ -4,7 +4,6 @@
 
 
 
-
 # Video-LLaMA: An Instruction-Finetuned Visual Language Model for Video Understanding
 <!-- **Video-LLaMA: An Instruction-Finetuned Visual Language Model for Video Understanding** -->
 
