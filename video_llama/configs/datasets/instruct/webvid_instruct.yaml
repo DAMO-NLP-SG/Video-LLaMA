@@ -1,0 +1,6 @@
+datasets:
+  webvid_instruct:
+    data_type: image
+    build_info:
+      anno_dir: /path/webvid_align/videochat_instruct_11k.json
+      videos_dir: /path/webvid_align/videos/

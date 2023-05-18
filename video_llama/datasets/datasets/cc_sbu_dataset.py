@@ -23,6 +23,7 @@ class CCSBUDataset(BaseDataset):
         return {
             "image": sample[0],
             "text_input": self.text_processor(sample[1]["caption"]),
+            "type":'image',
         }
 
 
@@ -44,4 +45,5 @@ class CCSBUAlignDataset(CaptionDataset):
             "image": image,
             "text_input": caption,
             "image_id": self.img_ids[ann["image_id"]],
+            "type":'image',
         }

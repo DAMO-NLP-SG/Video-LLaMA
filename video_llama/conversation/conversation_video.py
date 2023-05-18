@@ -15,7 +15,7 @@ from enum import auto, Enum
 from typing import List, Tuple, Any
 import os
 from video_llama.common.registry import registry
-
+from video_llama.processors.video_processor import ToTHWC,ToUint8,load_video
 
 class SeparatorStyle(Enum):
     """Different separator style."""
@@ -121,8 +121,8 @@ CONV_VISION = Conversation(
 )
 
 default_conversation = Conversation(
-    system="Give the following media: <Media>VisionContent</Media>.  "
-           "You will be able to see the media once I provide it to you, Focus on the dynamic information if it is a video. Please answer my questions.",
+    system="Give the following video: <Video>VideoContent</Video>. "
+           "You will be able to see the video once I provide it to you. Please answer my questions.",
     roles=("Human", "Assistant"),
     messages=[],
     offset=0,
@@ -141,7 +141,7 @@ class Chat:
 
     def ask(self, text, conv):
         if len(conv.messages) > 0 and conv.messages[-1][0] == conv.roles[0] \
-                and conv.messages[-1][1][-9:] == '</Vision>':  # last message is image.
+                and ('</Video>' in conv.messages[-1][1] or '</Image>' in conv.messages[-1][1]):  # last message is image.
             conv.messages[-1][1] = ' '.join([conv.messages[-1][1], text])
         else:
             conv.append_message(conv.roles[0], text)
@@ -183,34 +183,34 @@ class Chat:
         return output_text, output_token.cpu().numpy()
     
     def upload_img(self, image, conv, img_list):
-        # if isinstance(image, str):  # is a image path
-        #     vid = self.load_video(image, num_segments=4)
-        #     TC, H, W = vid.shape
-        #     image = vid.reshape(TC//3, 3, H, W).to(self.device)
-        # else:
-        #     raise NotImplementedError
-        
+
+        msg = ""
         if isinstance(image, str):  # is a image path
             ext = os.path.splitext(image)[-1].lower()
             if ext in ['.mp4', '.avi', '.mov']: # 视频
                 print(image)
-                image = self.vis_processor(image).unsqueeze(0).to(self.device)
+                # image = self.vis_processor(image).unsqueeze(0).to(self.device)
+                image, msg = load_video(
+                    video_path=image,
+                    n_frms=8,
+                    height=224,
+                    width=224,
+                    sampling ="uniform", return_msg = True
+                )
+                image = self.vis_processor.transform(image)
+                image = image.unsqueeze(0).to(self.device)
+                # print(image)
             else:   # 图片
                 raw_image = Image.open(image).convert('RGB').unsqueeze(1) # 增加一个时间维度
                 image = self.vis_processor(raw_image).unsqueeze(0).to(self.device)
         else:
             raise NotImplementedError
 
-
-
-
-
         image_emb, _ = self.model.encode_img(image)
         img_list.append(image_emb)
-        conv.append_message(conv.roles[0], "<Vision><ImageHere></Vision>")
-        msg = "Received."
-        # self.conv.append_message(self.conv.roles[1], msg)
-        return msg
+        conv.append_message(conv.roles[0], "<Video><ImageHere></Video> "+ msg)
+
+        return "Received."
 
     def get_context_emb(self, conv, img_list):
         prompt = conv.get_prompt()

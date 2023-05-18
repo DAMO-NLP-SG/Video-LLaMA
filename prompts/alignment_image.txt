@@ -1,0 +1,4 @@
+<Image><ImageHere></Image> Describe this image in detail.
+<Image><ImageHere></Image> Take a look at this image and describe what you notice.
+<Image><ImageHere></Image> Please provide a detailed description of the picture.
+<Image><ImageHere></Image> Could you describe the contents of this image for me?

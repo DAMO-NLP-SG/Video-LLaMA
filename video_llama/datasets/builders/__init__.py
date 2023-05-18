@@ -13,12 +13,15 @@ from video_llama.datasets.builders.image_text_pair_builder import (
 )
 from video_llama.datasets.builders.video_caption_builder import WebvidBuilder
 from video_llama.common.registry import registry
-
+from video_llama.datasets.builders.instruct_builder import WebvidInstruct_Builder,LlavaInstruct_Builder
 __all__ = [
     "CCSBUBuilder",
     "LaionBuilder",
     "CCSBUAlignBuilder",
     "WebvidBuilder",
+    "LlavaInstruct_Builder",
+    "WebvidInstruct_Builder"
+    
 ]
 
 

@@ -10,7 +10,7 @@ from video_llama.models.blip2 import Blip2Base, disabled_train
 from video_llama.models.modeling_llama import LlamaForCausalLM
 # from video_llama.models.Qformer import BertEncoder
 from transformers import LlamaTokenizer,BertConfig
-from transformers.models.bert.modeling_bert import BertEncoder
+# from transformers.models.bert.modeling_bert import BertEncoder
 import einops
 import copy
 from video_llama.models.Qformer import BertConfig, BertLMHeadModel
@@ -64,7 +64,8 @@ class VideoLLAMA(Blip2Base):
         llama_proj_model='',
         fusion_header_type= "seqTransf",
         max_frame_pos= 32,
-        fusion_head_layers = 2
+        fusion_head_layers = 2,
+        num_video_query_token = 32,
     ):
         super().__init__()
 
@@ -110,7 +111,12 @@ class VideoLLAMA(Blip2Base):
 
         logging.info('Loading LLAMA Tokenizer')
         self.llama_tokenizer = LlamaTokenizer.from_pretrained(llama_model, use_fast=False)
-        self.llama_tokenizer.pad_token = self.llama_tokenizer.eos_token
+        if self.llama_tokenizer.pad_token is None:
+            self.llama_tokenizer.pad_token = self.llama_tokenizer.eos_token 
+        DEFAULT_IMAGE_PATCH_TOKEN = '<ImageHere>'
+        self.llama_tokenizer.add_tokens([DEFAULT_IMAGE_PATCH_TOKEN], special_tokens=True)
+        self.IMAGE_PATCH_TOKEN_ID = self.llama_tokenizer.get_vocab()[DEFAULT_IMAGE_PATCH_TOKEN]
+        
         logging.info('Loading LLAMA Model')
         if self.low_resource:
             self.llama_model = LlamaForCausalLM.from_pretrained(
@@ -165,7 +171,8 @@ class VideoLLAMA(Blip2Base):
             self.prompt_list = []
 
         self.video_frame_position_embedding = nn.Embedding(max_frame_pos, self.Qformer.config.hidden_size)
-        self.video_Qformer,self.video_query_tokens = self.init_video_Qformer(num_query_token = num_query_token,\
+        self.num_video_query_token = num_video_query_token
+        self.video_Qformer,self.video_query_tokens = self.init_video_Qformer(num_query_token = num_video_query_token,\
             vision_width=self.Qformer.config.hidden_size, num_hidden_layers =2)
 
         self.video_Qformer.cls = None
@@ -237,6 +244,7 @@ class VideoLLAMA(Blip2Base):
     def prompt_wrap(self, img_embeds, atts_img, prompt):
         if prompt:
             batch_size = img_embeds.shape[0]
+            # print(prompt)
             p_before, p_after = prompt.split('<ImageHere>')
             p_before_tokens = self.llama_tokenizer(
                 p_before, return_tensors="pt", add_special_tokens=False).to(img_embeds.device)
@@ -246,78 +254,110 @@ class VideoLLAMA(Blip2Base):
             p_after_embeds = self.llama_model.model.embed_tokens(p_after_tokens.input_ids).expand(batch_size, -1, -1)
             wrapped_img_embeds = torch.cat([p_before_embeds, img_embeds, p_after_embeds], dim=1)
             wrapped_atts_img = atts_img[:, :1].expand(-1, wrapped_img_embeds.shape[1])
+            
             return wrapped_img_embeds, wrapped_atts_img
         else:
             return img_embeds, atts_img
 
     def forward(self, samples):
-        image = samples["image"]
-        #  batch 3 time, high,weight
-        if len(image.size()) != 5:
-            if self.training:
-                time = random.randint(1, 7)
-            else:
+        if 'conv_type' in samples.keys() and samples['conv_type']=='multi':
+            num_patch_tokens = self.num_video_query_token
+            im_patch_token_id = self.IMAGE_PATCH_TOKEN_ID
+            image = samples["images"]
+            input_ids = samples['input_ids']
+            if len(image.size())==4:
                 time = 1
-            image = einops.repeat(image, 'b c h w -> b c t h w',t = time)
+                image = einops.repeat(image, 'b c h w -> b c t h w',t = time)
+            img_embeds, atts_img = self.encode_img(image)
+
+            temp_input_ids = copy.deepcopy(input_ids)
+            temp_input_ids[temp_input_ids == im_patch_token_id] = 0
+            temp_input_embedding = self.llama_model.model.embed_tokens(temp_input_ids)
+
+            new_input_embeds=[]
+            cur_image_idx = 0
+            for cur_input_ids, cur_input_embeds in zip(input_ids, temp_input_embedding):
+                cur_image_features = img_embeds[cur_image_idx]
+
+                if (cur_input_ids == im_patch_token_id).sum() != num_patch_tokens:
+                        raise ValueError("The number of image patch tokens should be the same as the number of image patches.")
+                masked_indices = torch.where(cur_input_ids == im_patch_token_id)[0]
+                mask_index_start = masked_indices[0]
+                if (masked_indices != torch.arange(mask_index_start, mask_index_start+num_patch_tokens, device=masked_indices.device, dtype=masked_indices.dtype)).any():
+                    raise ValueError("The image patch tokens should be consecutive.")
+                
+                cur_new_input_embeds = torch.cat((cur_input_embeds[:mask_index_start], cur_image_features, cur_input_embeds[mask_index_start+num_patch_tokens:]), dim=0)
+                new_input_embeds.append(cur_new_input_embeds)
+
+                cur_image_idx+=1
+            inputs_embeds = torch.stack(new_input_embeds, dim=0)
+            targets = samples['labels']
+            attention_mask = samples['attention_mask']
+            with self.maybe_autocast():
+                outputs = self.llama_model(
+                    inputs_embeds=inputs_embeds,
+                    attention_mask=attention_mask,
+                    return_dict=True,
+                    labels=targets,
+                )
+            loss = outputs.loss
+            return {"loss": loss}
+        else:
+            image = samples["image"]
+
+            if len(image.size()) != 5:
+                time = 1
+                image = einops.repeat(image, 'b c h w -> b c t h w',t = time)
+                
+            img_embeds, atts_img = self.encode_img(image)
             
-        img_embeds, atts_img = self.encode_img(image)
-        
-        if self.prompt_list:
-            if 'type' in samples.keys() :
-                # video
-                prompt = random.choice(['###Human: <Vision><ImageHere></Vision> Describe this image/video. ###Assistant: ',
-                                        '###Human: <Vision><ImageHere></Vision> Generate a caption for this image/video. ###Assistant: ',
-                                        '###Human: <Vision><ImageHere></Vision> Create a caption that captures the essence of this image/video. ###Assistant: ',
-                                        '###Human: <Vision><ImageHere></Vision> Generate a descriptive title that summarizes this image/video. ###Assistant: '])
-            else:
+            if self.prompt_list:
                 prompt = random.choice(self.prompt_list)
+                img_embeds, atts_img = self.prompt_wrap(img_embeds, atts_img, prompt)
+                
 
+            self.llama_tokenizer.padding_side = "right"
 
-            img_embeds, atts_img = self.prompt_wrap(img_embeds, atts_img, prompt)
+            text = [t + self.end_sym for t in samples["text_input"]]
 
+            to_regress_tokens = self.llama_tokenizer(
+                text,
+                return_tensors="pt",
+                padding="longest",
+                truncation=True,
+                max_length=self.max_txt_len,
+                add_special_tokens=False
+            ).to(image.device)
 
-        self.llama_tokenizer.padding_side = "right"
-
-        text = [t + self.end_sym for t in samples["text_input"]]
-
-        to_regress_tokens = self.llama_tokenizer(
-            text,
-            return_tensors="pt",
-            padding="longest",
-            truncation=True,
-            max_length=self.max_txt_len,
-            add_special_tokens=False
-        ).to(image.device)
-
-        targets = to_regress_tokens.input_ids.masked_fill(
-            to_regress_tokens.input_ids == self.llama_tokenizer.pad_token_id, -100
-        )
-
-        empty_targets = (
-            torch.ones([atts_img.shape[0], atts_img.shape[1]+1],
-                    dtype=torch.long).to(image.device).fill_(-100)  # plus one for bos
-        )
-        targets = torch.cat([empty_targets, targets], dim=1)
-
-        batch_size = img_embeds.shape[0]
-        bos = torch.ones([batch_size, 1],
-                        dtype=to_regress_tokens.input_ids.dtype,
-                        device=to_regress_tokens.input_ids.device) * self.llama_tokenizer.bos_token_id
-        bos_embeds = self.llama_model.model.embed_tokens(bos)
-        atts_bos = atts_img[:, :1]
-
-        to_regress_embeds = self.llama_model.model.embed_tokens(to_regress_tokens.input_ids)
-        inputs_embeds = torch.cat([bos_embeds, img_embeds, to_regress_embeds], dim=1)
-        attention_mask = torch.cat([atts_bos, atts_img, to_regress_tokens.attention_mask], dim=1)
-
-        with self.maybe_autocast():
-            outputs = self.llama_model(
-                inputs_embeds=inputs_embeds,
-                attention_mask=attention_mask,
-                return_dict=True,
-                labels=targets,
+            targets = to_regress_tokens.input_ids.masked_fill(
+                to_regress_tokens.input_ids == self.llama_tokenizer.pad_token_id, -100
             )
-        loss = outputs.loss
+
+            empty_targets = (
+                torch.ones([atts_img.shape[0], atts_img.shape[1]+1],
+                        dtype=torch.long).to(image.device).fill_(-100)  # plus one for bos
+            )
+            targets = torch.cat([empty_targets, targets], dim=1)
+
+            batch_size = img_embeds.shape[0]
+            bos = torch.ones([batch_size, 1],
+                            dtype=to_regress_tokens.input_ids.dtype,
+                            device=to_regress_tokens.input_ids.device) * self.llama_tokenizer.bos_token_id
+            bos_embeds = self.llama_model.model.embed_tokens(bos)
+            atts_bos = atts_img[:, :1]
+
+            to_regress_embeds = self.llama_model.model.embed_tokens(to_regress_tokens.input_ids)
+            inputs_embeds = torch.cat([bos_embeds, img_embeds, to_regress_embeds], dim=1)
+            attention_mask = torch.cat([atts_bos, atts_img, to_regress_tokens.attention_mask], dim=1)
+
+            with self.maybe_autocast():
+                outputs = self.llama_model(
+                    inputs_embeds=inputs_embeds,
+                    attention_mask=attention_mask,
+                    return_dict=True,
+                    labels=targets,
+                )
+            loss = outputs.loss
 
         return {"loss": loss}
 
@@ -348,7 +388,8 @@ class VideoLLAMA(Blip2Base):
         fusion_header_type = cfg.get("fusion_header_type", 'seqTransf')
         max_frame_pos = cfg.get("max_frame_pos", 32)
         fusion_head_layers = cfg.get("fusion_head_layers", 2)
-        
+        num_video_query_token =  cfg.get("num_video_query_token", 32)
+
         model = cls(
             vit_model=vit_model,
             q_former_model=q_former_model,
@@ -370,6 +411,7 @@ class VideoLLAMA(Blip2Base):
             max_frame_pos=max_frame_pos,
             fusion_head_layers=fusion_head_layers,
             frozen_llama_proj=frozen_llama_proj,
+            num_video_query_token=num_video_query_token
         )
 
         ckpt_path = cfg.get("ckpt", "")  # load weights of MiniGPT-4
@@ -377,5 +419,4 @@ class VideoLLAMA(Blip2Base):
             print("Load BLIP2-LLM Checkpoint: {}".format(ckpt_path))
             ckpt = torch.load(ckpt_path, map_location="cpu")
             msg = model.load_state_dict(ckpt['model'], strict=False)
-            
         return model

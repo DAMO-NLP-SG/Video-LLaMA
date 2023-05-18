@@ -1,0 +1,6 @@
+datasets:
+  llava_instruct:
+    data_type: image
+    build_info:
+      anno_dir: /path/llava_instruct_150k.json
+      videos_dir: /path/train2014/train2014/

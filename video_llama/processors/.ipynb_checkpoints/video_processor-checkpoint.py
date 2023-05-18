@@ -17,13 +17,9 @@ from video_llama.processors import functional_video as F
 from omegaconf import OmegaConf
 from torchvision import transforms
 import random as rnd
-
-
 MAX_INT = registry.get("MAX_INT")
-decord.bridge.set_bridge("torch")
 
-def load_video(video_path, n_frms=MAX_INT, height=-1, width=-1, sampling="uniform", return_msg = False):
-    decord.bridge.set_bridge("torch")
+def load_video(video_path, n_frms=MAX_INT, height=-1, width=-1, sampling="uniform"):
     vr = VideoReader(uri=video_path, height=height, width=width)
 
     vlen = len(vr)
@@ -41,20 +37,13 @@ def load_video(video_path, n_frms=MAX_INT, height=-1, width=-1, sampling="unifor
         raise NotImplementedError
 
     # get_batch -> T, H, W, C
-    temp_frms = vr.get_batch(indices)
-    # print(type(temp_frms))
-    tensor_frms = torch.from_numpy(temp_frms) if type(temp_frms) is not torch.Tensor else temp_frms
-    frms = tensor_frms.permute(3, 0, 1, 2).float()  # (C, T, H, W)
+    print(video_path)
+    print(indices)
+    print(vr.get_batch(indices))
 
-    if not return_msg:
-        return frms
-
-    fps = float(vr.get_avg_fps())
-    sec = ", ".join([str(round(f / fps, 1)) for f in indices])
-    # " " should be added in the start and end
-    msg = f"The video contains {len(indices)} frames sampled at {sec} seconds. "
-    return frms, msg
-
+    frms = vr.get_batch(indices).permute(3, 0, 1, 2).float()  # (C, T, H, W)
+    # print(111)
+    return frms
 
 class AlproVideoBaseProcessor(BaseProcessor):
     def __init__(self, mean=None, std=None, n_frms=MAX_INT):
@@ -139,7 +128,24 @@ class AlproVideoTrainProcessor(AlproVideoBaseProcessor):
                     scale=(min_scale, max_scale),
                     interpolation_mode="bicubic",
                 ),
+                transforms_video.RandomHorizontalFlipVideo(),
                 ToTHWC(),  # C, T, H, W -> T, H, W, C
+                VideoRandomAugment(
+                    2,
+                    5,
+                    augs=[
+                        "Identity",
+                        "AutoContrast",
+                        "Brightness",
+                        "Sharpness",
+                        "Equalize",
+                        "ShearX",
+                        "ShearY",
+                        "TranslateX",
+                        "TranslateY",
+                        "Rotate",
+                    ],
+                ),
                 ToUint8(),
                 transforms_video.ToTensorVideo(),  # T, H, W, C -> C, T, H, W
                 self.normalize,
