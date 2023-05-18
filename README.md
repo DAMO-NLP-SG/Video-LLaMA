@@ -44,9 +44,12 @@ https://github.com/DAMO-NLP-SG/Video-LLaMA/assets/21003563/9a34cfb0-cb97-43ec-87
 The checkpoint stores only learnable parameters (frame embeddings, one two-layer transformer block and one linear projection layer)
 | Checkpoint       | Link | Note |
 |:------------|-------------|-------------|
-| s1_pretrain_v1_13B (**recommended**)    | [link](https://drive.google.com/file/d/15hqyM-2iMi-4zqLSb57IpsAMByEv0-va/view?usp=sharing)       | Pre-trained on WebVid (2.5M video-caption pairs) and LLaVA-CC3M (595k image-caption pairs) |
-| s2_image_instruct_tune_13B | [link](https://drive.google.com/file/d/15hqyM-2iMi-4zqLSb57IpsAMByEv0-va/view?usp=sharing) | Instruction-tuned on MiniGPT4-image-text-align dataset |
-
+| pretrain-vicuna13b    | [link](https://huggingface.co/DAMO-NLP-SG/Video-LLaMA-Series/resolve/main/pretrain-vicuna13b.pth)       | Pre-trained on WebVid (2.5M video-caption pairs) and LLaVA-CC3M (595k image-caption pairs) |
+| finetune-vicuna13b-v2 | [link](https://huggingface.co/DAMO-NLP-SG/Video-LLaMA-Series/resolve/main/finetune-vicuna13b-v2.pth) | Instruction-tuned on VideoChat-video-Instruction-align dataset |
+| pretrain-ziya13b-zh | [link](https://huggingface.co/DAMO-NLP-SG/Video-LLaMA-Series/resolve/main/pretrain-ziya13b-zh.pth) | Pre-trained with Chinese LLM [Ziya-13B](https://huggingface.co/IDEA-CCNL/Ziya-LLaMA-13B-v1) as the frozen language decoder |
+| finetune-ziya13b-zh | [link](https://huggingface.co/DAMO-NLP-SG/Video-LLaMA-Series/resolve/main/finetune-ziya13b-zh.pth) | Instruction-tuned on Chinese-video-Instruction-align dataset |
+| pretrain-billa7b-zh | [link](https://huggingface.co/DAMO-NLP-SG/Video-LLaMA-Series/resolve/main/pretrain-billa7b-zh.pth) | Pre-trained with Chinese LLM [BiLLA-7B](https://huggingface.co/IDEA-CCNL/Ziya-LLaMA-13B-v1) as the frozen language decoder |
+| finetune-billa7b-zh.pth | [link](https://huggingface.co/DAMO-NLP-SG/Video-LLaMA-Series/resolve/main/finetune-billa7b-zh.pth) | Instruction-tuned on Chinese-video-Instruction-align dataset |
 ## Usage
 ### Enviroment Preparation 
 
