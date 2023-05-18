@@ -121,8 +121,7 @@ CONV_VISION = Conversation(
 )
 
 default_conversation = Conversation(
-    system="Give the following video: <Video>VideoContent</Video>. "
-           "You will be able to see the video once I provide it to you. Please answer my questions.",
+    system="",
     roles=("Human", "Assistant"),
     messages=[],
     offset=0,
