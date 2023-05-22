@@ -9,7 +9,12 @@
 
 This is the repo for the Video-LLaMA project, which is working on empowering large language models with video understanding capability. 
 
-Continuously upgrading, stay tuned for more updates!
+<div style='display:flex; gap: 0.25rem; '>
+<a href='https://huggingface.co/spaces/DAMO-NLP-SG/Video-LLaMA'><img src='https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Demo-blue'></a>
+<a href='https://modelscope.cn/studios/damo/video-llama/summary'><img src='https://img.shields.io/badge/ModelScope-Demo-blueviolet'></a> 
+<a href='https://huggingface.co/DAMO-NLP-SG/Video-LLaMA-Series'><img src='https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Model-blue'></a> 
+<a href='https://github.com/DAMO-NLP-SG/Video-LLaMA/paper.pdf'><img src='https://img.shields.io/badge/Paper-PDF-red'></a>
+</div>
 
 ## News
 - [05.22] 🚀🚀 Interactive demo online, try our Video-LLaMA at [Hugging Face](https://huggingface.co/spaces/DAMO-NLP-SG/Video-LLaMA) and [ModelScope]()!!
