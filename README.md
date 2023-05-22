@@ -12,7 +12,9 @@ This is the repo for the Video-LLaMA project, which is working on empowering lar
 Continuously upgrading, stay tuned for more updates!
 
 ## News
-- [05.18] 🚀 Support video-grounded chat in Chinese 🚀
+- [05.22] 🚀🚀 Interactive demo online, try our Video-LLaMA at [Hugging Face](https://huggingface.co/spaces/DAMO-NLP-SG/Video-LLaMA) and [ModelScope]()!!
+- [05.22] ⭐️ Release **Video-LLaMA v2** built with Vicuna-7B
+- [05.18] 🚀🚀 Support video-grounded chat in Chinese 
     - [**Video-LLaMA-BiLLA**](https://huggingface.co/DAMO-NLP-SG/Video-LLaMA-Series/resolve/main/finetune-billa7b-zh.pth): we introduce [BiLLa-7B](https://huggingface.co/Neutralzz/BiLLa-7B-SFT) as language decoder and fine-tune the video-language aligned model (i.e., stage 1 model) with machine-translated [VideoChat](https://github.com/OpenGVLab/InternVideo/tree/main/Data/instruction_data) instructions.   
     - [**Video-LLaMA-Ziya**](https://huggingface.co/DAMO-NLP-SG/Video-LLaMA-Series/resolve/main/finetune-ziya13b-zh.pth): same with Video-LLaMA-BiLLA but the language decoder is changed to [Ziya-13B](https://huggingface.co/IDEA-CCNL/Ziya-LLaMA-13B-v1).    
 - [05.18] ⭐️ Create a Huggingface [repo](https://huggingface.co/DAMO-NLP-SG/Video-LLaMA-Series) to store the model weights of all the variants of our Video-LLaMA.
@@ -44,6 +46,8 @@ https://github.com/DAMO-NLP-SG/Video-LLaMA/assets/21003563/9a34cfb0-cb97-43ec-87
 The checkpoint stores only learnable parameters (frame embeddings, one two-layer transformer block and one linear projection layer)
 | Checkpoint       | Link | Note |
 |:------------|-------------|-------------|
+| pretrain-vicuna7b    | [link]()       | Pre-trained on WebVid (2.5M video-caption pairs) and LLaVA-CC3M (595k image-caption pairs) |
+| finetune-vicuna7b-v2 | [link]() | Fine-tuned on [VideoChat](https://github.com/OpenGVLab/Ask-Anything) instruction-following dataset|
 | pretrain-vicuna13b    | [link](https://huggingface.co/DAMO-NLP-SG/Video-LLaMA-Series/resolve/main/pretrain-vicuna13b.pth)       | Pre-trained on WebVid (2.5M video-caption pairs) and LLaVA-CC3M (595k image-caption pairs) |
 | finetune-vicuna13b-v2 | [link](https://huggingface.co/DAMO-NLP-SG/Video-LLaMA-Series/resolve/main/finetune-vicuna13b-v2.pth) | Fine-tuned on [VideoChat](https://github.com/OpenGVLab/Ask-Anything) instruction-following dataset|
 | pretrain-ziya13b-zh | [link](https://huggingface.co/DAMO-NLP-SG/Video-LLaMA-Series/resolve/main/pretrain-ziya13b-zh.pth) | Pre-trained with Chinese LLM [Ziya-13B](https://huggingface.co/IDEA-CCNL/Ziya-LLaMA-13B-v1) |
