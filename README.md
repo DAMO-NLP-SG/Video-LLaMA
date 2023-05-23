@@ -17,7 +17,7 @@ This is the repo for the Video-LLaMA project, which is working on empowering lar
 </div>
 
 ## News
-- [05.22] 🚀🚀 Interactive demo online, try our Video-LLaMA (with Vicuna-7B as language decoder) at [Hugging Face](https://huggingface.co/spaces/DAMO-NLP-SG/Video-LLaMA) and [ModelScope](https://pre.modelscope.cn/studios/damo/video-llama/summary)!!
+- [05.22] 🚀🚀 Interactive demo online, try our Video-LLaMA (with **Vicuna-7B** as language decoder) at [Hugging Face](https://huggingface.co/spaces/DAMO-NLP-SG/Video-LLaMA) and [ModelScope](https://pre.modelscope.cn/studios/damo/video-llama/summary)!!
 - [05.22] ⭐️ Release **Video-LLaMA v2** built with Vicuna-7B
 - [05.18] 🚀🚀 Support video-grounded chat in Chinese 
     - [**Video-LLaMA-BiLLA**](https://huggingface.co/DAMO-NLP-SG/Video-LLaMA-Series/resolve/main/finetune-billa7b-zh.pth): we introduce [BiLLa-7B](https://huggingface.co/Neutralzz/BiLLa-7B-SFT) as language decoder and fine-tune the video-language aligned model (i.e., stage 1 model) with machine-translated [VideoChat](https://github.com/OpenGVLab/InternVideo/tree/main/Data/instruction_data) instructions.   
@@ -69,7 +69,7 @@ conda activate videollama
 ```
 
 
-## Prerequisite Checkpoints
+## Prerequisites
 
 Before using the repository, make sure you have obtained the following checkpoints:
 - Get the original LLaMA weights in the huggingface format by following the instructions [here](https://huggingface.co/docs/transformers/main/model_doc/llama).
