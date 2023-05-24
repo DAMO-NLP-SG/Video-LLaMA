@@ -21,7 +21,7 @@ model:
 
   max_txt_len: 160
   end_sym: "###"
-  prompt_path: "prompts/alignment_video.txt"
+  prompt_path: "prompts/alignment_image.txt"
   prompt_template: '###Human: {} ###Assistant: '
   ckpt: 'path/pretrained_ckpt'
 
