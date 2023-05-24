@@ -19,7 +19,7 @@ model:
   max_frame_pos: 32
   fusion_header_type: "seqTransf"
 
-  max_txt_len: 160
+  max_txt_len: 320
   end_sym: "###"
   prompt_path: "prompts/alignment_image.txt"
   prompt_template: '###Human: {} ###Assistant: '
@@ -28,7 +28,10 @@ model:
   
 
 datasets:
-    cc_sbu_align:
+  cc_sbu_align:
+    data_type: images
+      build_info:
+        storage: path/cc_sbu_align/
       vis_processor:
         train:
           name: "blip2_image_train"
@@ -36,7 +39,35 @@ datasets:
       text_processor:
         train:
           name: "blip_caption"
-      sample_ratio: 1
+      
+    llava_instruct:
+      data_type: images
+      build_info:
+        anno_dir: path/llava_instruct_150k.json
+        videos_dir: path/train2014/
+      vis_processor:
+        train:
+          name: "blip2_image_train"
+          image_size: 224
+      text_processor:
+        train:
+          name: "blip_caption"
+      num_video_query_token: 32
+
+    webvid_instruct:
+      data_type: video
+      build_info:
+        anno_dir: path/videochat_instruct_11k.json
+        videos_dir: path/webvid_align/videos/
+      vis_processor:
+        train:
+          name: "alpro_video_train"
+          n_frms: 8
+          image_size: 224
+      text_processor:
+        train:
+          name: "blip_caption"
+      num_video_query_token: 32
 
 
 run:
@@ -48,7 +79,7 @@ run:
   warmup_lr: 1e-6
 
   weight_decay: 0.05
-  max_epoch: 5
+  max_epoch: 3
   iters_per_epoch: 1000
   batch_size_train: 4
   batch_size_eval: 4
