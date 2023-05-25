@@ -101,7 +101,7 @@ The training of Video-LLaMA consists of two stages,
 
 2. Fine-tuning using the image-based instruction-tuning data from MiniGPT-4.
 
-### 1. Pre-training
+### 1. Vision-Language Pre-training
 #### Data Preparation
 Download the metadata and video following the instruction from the official Github repo of [Webvid](https://github.com/m-bain/webvid).
 The folder structure of the dataset is shown below:
@@ -128,15 +128,18 @@ conda activate videollama
 torchrun --nproc_per_node=8 train.py --cfg-path  ./train_configs/video_llama_stage1_pretrain.yaml
 ```
 
-### 2. Fine-tuning
-#### Data Download 
-Refer to the instuction in MiniGPT4 repo: [link](https://github.com/Vision-CAIR/MiniGPT-4/blob/main/dataset/README_2_STAGE.md)
+### 2. Instruction Fine-tuning
+#### Data
+For now, the fine-tuning dataset consists of:
+* 150K image-based instructions from LLaVA [[link](https://huggingface.co/datasets/liuhaotian/LLaVA-Instruct-150K/raw/main/llava_instruct_150k.json)]
+* 3K image-based instructions from MiniGPT-4 [[link](https://github.com/Vision-CAIR/MiniGPT-4/blob/main/dataset/README_2_STAGE.md)]
+* 11K video-based instructions from VideoChat [[link](https://github.com/OpenGVLab/InternVideo/tree/main/Data/instruction_data)]
 
 #### Script
 Config the the checkpoint and dataset paths in [video_llama_stage2_finetune.yaml](./train_configs/video_llama_stage2_finetune.yaml)
 ```
 conda activate videollama
-torchrun --nproc_per_node=8 train.py --cfg-path  ./train_configs/video_llama_stage1_pretrain.yaml
+torchrun --nproc_per_node=8 train.py --cfg-path  ./train_configs/video_llama_stage2_finetune.yaml
 ```
 
 ## Acknowledgement
