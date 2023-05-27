@@ -74,7 +74,7 @@ conda activate videollama
 Before using the repository, make sure you have obtained the following checkpoints:
 - Get the original LLaMA weights in the huggingface format by following the instructions [here](https://huggingface.co/docs/transformers/main/model_doc/llama).
 - Download [Vicuna delta weights](https://huggingface.co/lmsys/vicuna-13b-delta-v0). 
-- Use the following command to add delta weights to the original LLaMA weights to obtain the Vicuna weights.
+- Use the following command to add delta weights to the original LLaMA weights to obtain the Vicuna weights:
 
 ```
 python apply_delta.py \
@@ -85,7 +85,7 @@ python apply_delta.py \
 - Download the MiniGPT-4 model (trained linear layer) from this [link](https://drive.google.com/file/d/1a4zLvaiDBr-36pasffmgpvH5P7CKmpze/view).
 
 ## Download Learnable Weights
-Use `git-lfs` to download the learnable weights of our Video-LLaMA (i.e., frame embeddings + Video Q-Former + linear projector)
+Use `git-lfs` to download the learnable weights of our Video-LLaMA (i.e., frame embeddings + Video Q-Former + linear projector):
 ```bash
 git lfs install
 git clone https://huggingface.co/DAMO-NLP-SG/Video-LLaMA-Series
@@ -99,7 +99,7 @@ should meet the requirement.
 ## How to Run Demo Locally
 
 Firstly, set the `llama_model` and `ckpt` in [eval_configs/video_llama_eval.yaml](./eval_configs/video_llama_eval.yaml).
-Then run the script
+Then run the script:
 ```
 python demo_video.py \
     --cfg-path eval_configs/video_llama_eval.yaml  --gpu-id 0
