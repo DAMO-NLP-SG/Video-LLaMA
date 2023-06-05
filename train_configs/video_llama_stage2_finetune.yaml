@@ -40,35 +40,36 @@ datasets:
         train:
           name: "blip_caption"
       
-    llava_instruct:
-      data_type: images
-      build_info:
-        anno_dir: path/llava_instruct_150k.json
-        videos_dir: path/train2014/
-      vis_processor:
-        train:
-          name: "blip2_image_train"
-          image_size: 224
-      text_processor:
-        train:
-          name: "blip_caption"
-      num_video_query_token: 32
-
-    webvid_instruct:
-      data_type: video
-      build_info:
-        anno_dir: path/videochat_instruct_11k.json
-        videos_dir: path/webvid_align/videos/
-      vis_processor:
-        train:
-          name: "alpro_video_train"
-          n_frms: 8
-          image_size: 224
-      text_processor:
-        train:
-          name: "blip_caption"
-      num_video_query_token: 32
-
+  llava_instruct:
+    data_type: images
+    build_info:
+      anno_dir: path/llava_instruct_150k.json
+      videos_dir: path/train2014/
+    vis_processor:
+      train:
+        name: "blip2_image_train"
+        image_size: 224
+    text_processor:
+      train:
+        name: "blip_caption"
+    num_video_query_token: 32
+    tokenizer_name: "ckpt/vicuna-13b/"
+    
+  webvid_instruct:
+    data_type: video
+    build_info:
+      anno_dir: path/videochat_instruct_11k.json
+      videos_dir: path/webvid_align/videos/
+    vis_processor:
+      train:
+        name: "alpro_video_train"
+        n_frms: 8
+        image_size: 224
+    text_processor:
+      train:
+        name: "blip_caption"
+    num_video_query_token: 32
+    tokenizer_name: "ckpt/vicuna-13b/"
 
 run:
   task: video_text_pretrain
