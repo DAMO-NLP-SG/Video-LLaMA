@@ -14,6 +14,7 @@ import pathlib
 import json
 from transformers import AutoTokenizer, AutoModelForCausalLM, LlamaTokenizer
 from video_llama.conversation.conversation_video import Conversation,SeparatorStyle
+from video_llama.processors import transforms_video,AlproVideoTrainProcessor
 DEFAULT_IMAGE_PATCH_TOKEN = '<ImageHere>'
 DEFAULT_IMAGE_TOKEN = "<image>"
 import copy
