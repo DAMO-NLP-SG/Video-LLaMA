@@ -17,6 +17,7 @@ This is the repo for the Video-LLaMA project, which is working on empowering lar
 </div>
 
 ## News
+- [06.08] 🚀🚀 Next BIG updates are on the way!!
 - [05.22] 🚀🚀 Interactive demo online, try our Video-LLaMA (with **Vicuna-7B** as language decoder) at [Hugging Face](https://huggingface.co/spaces/DAMO-NLP-SG/Video-LLaMA) and [ModelScope](https://pre.modelscope.cn/studios/damo/video-llama/summary)!!
 - [05.22] ⭐️ Release **Video-LLaMA v2** built with Vicuna-7B
 - [05.18] 🚀🚀 Support video-grounded chat in Chinese 
