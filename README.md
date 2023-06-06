@@ -174,7 +174,7 @@ If you find our project useful, hope you can star our repo and cite our paper as
 ```
 @article{damonlpsg2023videollama,
   author = {Zhang, Hang and Li, Xin and Bing, Lidong},
-  title = {Video-LLaMA: An Instruction-Finetuned Visual Language Model for Video Understanding},
+  title = {Video-LLaMA: An Instruction-tuned Audio-Visual Language Model for Video Understanding},
   year = 2023,
   journal = {arXiv preprint arXiv:2306.02858}
   url = {https://arxiv.org/abs/2306.02858}
