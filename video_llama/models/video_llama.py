@@ -72,6 +72,7 @@ class VideoLLAMA(Blip2Base):
         fusion_head_layers = 2,
         num_video_query_token = 32,
         num_audio_query_token = 8,
+        imagebind_ckpt_path = '/mnt/workspace/ckpt'
     ):
         super().__init__()
 
@@ -211,7 +212,6 @@ class VideoLLAMA(Blip2Base):
             self.video_query_tokens.requires_grad = True
             logging.info('video_Qformer is not frozen')
 
-        imagebind_ckpt_path = '/mnt/workspace/ckpt'
         print (f'Initializing audio encoder from {imagebind_ckpt_path} ...')
         self.audio_encoder,self.audio_hidden_size = \
             imagebind_model.imagebind_huge()
@@ -563,6 +563,7 @@ class VideoLLAMA(Blip2Base):
         fusion_head_layers = cfg.get("fusion_head_layers", 2)
         num_video_query_token =  cfg.get("num_video_query_token", 32)
         num_audio_query_token =  cfg.get("num_audio_query_token", 8)
+        imagebind_ckpt_path = cfg.get("imagebind_ckpt_path", 8)
         model = cls(
             vit_model=vit_model,
             q_former_model=q_former_model,
@@ -588,6 +589,7 @@ class VideoLLAMA(Blip2Base):
             frozen_audio_Qformer=frozen_audio_Qformer,
             num_video_query_token=num_video_query_token,
             num_audio_query_token = num_audio_query_token,
+            imagebind_ckpt_path = imagebind_ckpt_path,
         )
 
         ckpt_path = cfg.get("ckpt", "")  # load weights of MiniGPT-4

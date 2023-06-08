@@ -10,6 +10,7 @@ model:
   frozen_llama_proj: False
 
   llama_model: "ckpt/vicuna-13b/" or "ckpt/vicuna-7b/" 
+  imagebind_ckpt_path: "ckpt/imagebind_path/"
 
   fusion_head_layers: 2
   max_frame_pos: 32

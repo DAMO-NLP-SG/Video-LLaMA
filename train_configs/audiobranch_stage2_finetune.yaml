@@ -10,7 +10,7 @@ model:
   num_video_query_token: 32
   # Vicuna
   llama_model: "ckpt/vicuna-13b/" or "ckpt/vicuna-7b/"
-
+  imagebind_ckpt_path: "ckpt/imagebind_path/"
   # only train audio branch
   frozen_llama_proj: True
   frozen_video_Qformer: True

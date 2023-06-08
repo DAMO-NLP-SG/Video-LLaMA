@@ -10,6 +10,7 @@ model:
   frozen_llama_proj: False
 
   llama_model: "ckpt/vicuna-13b/"
+  
   llama_proj_model: 'ckpt/pretrained_minigpt4.pth'
 
   fusion_head_layers: 2
