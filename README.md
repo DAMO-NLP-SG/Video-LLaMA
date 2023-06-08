@@ -36,7 +36,7 @@ This is the repo for the Video-LLaMA project, which is working on empowering lar
 - After pre-training, we further fine-tune our Video-LLaMA using the ~~image-based instruction-tuning data from [MiniGPT-4](https://github.com/Vision-CAIR/MiniGPT-4)~~ video-based training data from [VideoChat](https://github.com/OpenGVLab/Ask-Anything) (7K video detailed descriptions + 4K video-based conversations).  
 - Note that only the newly added layers and linear projection layer are trainable in both pre-training and instruction-tuning stages, such components serve as the "adapter" between video and text. 
 <p align="center" width="100%">
-<a target="_blank"><img src="figs/architecture.png" alt="Video-LLaMA" style="width: 80%; min-width: 200px; display: block; margin: auto;"></a>
+<a target="_blank"><img src="figs/architecture_v2.png" alt="Video-LLaMA" style="width: 80%; min-width: 200px; display: block; margin: auto;"></a>
 </p>
 
 
