@@ -11,6 +11,7 @@ dependencies:
   - pytorch-mutex=1.0=cuda
   - torchaudio=0.12.1
   - torchvision=0.13.1
+  - pytorchvideo=0.1.5
   - pip:
     - accelerate==0.16.0
     - aiohttp==3.8.4
@@ -63,4 +64,6 @@ dependencies:
     - wandb
     - einops
     - SentencePiece
-    - 
+    - ftfy
+
+
