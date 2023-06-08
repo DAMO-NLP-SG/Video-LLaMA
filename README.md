@@ -128,11 +128,11 @@ should meet the requirement.
 
 ## How to Run Demo Locally
 
-Firstly, set the `llama_model` and `ckpt` in [eval_configs/video_llama_eval.yaml](./eval_configs/video_llama_eval.yaml).
+Firstly, set the `llama_model`, `imagebind_ckpt_path`, `ckpt` and `ckpt_2` in [eval_configs/video_llama_eval_withaudio.yaml](./eval_configs/video_llama_eval_withaudio.yaml).
 Then run the script:
 ```
-python demo_video.py \
-    --cfg-path eval_configs/video_llama_eval.yaml  --gpu-id 0
+python demo_audiovideo.py \
+    --cfg-path eval_configs/video_llama_eval_withaudio.yaml  --gpu-id 0
 ```
 
 ## Training
