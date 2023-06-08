@@ -7,39 +7,40 @@ model:
 
   # Q-Former
   num_query_token: 32
-
+  num_video_query_token: 32
   # Vicuna
   llama_model: "ckpt/vicuna-13b/" or "ckpt/vicuna-7b/"
 
-  # llama project 
-  frozen_llama_proj: False
-  llama_proj_model: 'ckpt/pretrained_minigpt4.pth'
+  # only train audio branch
+  frozen_llama_proj: True
+  frozen_video_Qformer: True
+  frozen_audio_Qformer: False
 
   fusion_head_layers: 2
   max_frame_pos: 32
   fusion_header_type: "seqTransf"
 
-  max_txt_len: 320
+  max_txt_len: 512
   end_sym: "###"
   prompt_path: "prompts/alignment_image.txt"
   prompt_template: '###Human: {} ###Assistant: '
-  ckpt: 'path/pretrained_ckpt'
-
+  ckpt: 'path/pretrained_visual_branch_ckpt'
+  ckpt_2:  'path/pretrained_audio_branch_ckpt'
   
 
 datasets:
   cc_sbu_align:
     data_type: images
-      build_info:
-        storage: path/cc_sbu_align/
-      vis_processor:
-        train:
-          name: "blip2_image_train"
-          image_size: 224
-      text_processor:
-        train:
-          name: "blip_caption"
-      
+    build_info:
+      storage: path/cc_sbu_align/
+    vis_processor:
+      train:
+        name: "blip2_image_train"
+        image_size: 224
+    text_processor:
+      train:
+        name: "blip_caption"
+    
   llava_instruct:
     data_type: images
     build_info:
@@ -52,9 +53,9 @@ datasets:
     text_processor:
       train:
         name: "blip_caption"
-    num_video_query_token: 32
-    tokenizer_name: "ckpt/vicuna-13b/"
-    
+    num_video_query_token: 8
+    tokenizer_name: "ckpt/vicuna-13b/" or "ckpt/vicuna-7b/"
+
   webvid_instruct:
     data_type: video
     build_info:
@@ -68,9 +69,9 @@ datasets:
     text_processor:
       train:
         name: "blip_caption"
-    num_video_query_token: 32
-    tokenizer_name: "ckpt/vicuna-13b/"
-
+    num_video_query_token: 8
+    tokenizer_name: "ckpt/vicuna-13b/" or "ckpt/vicuna-7b/"
+    
 run:
   task: video_text_pretrain
   # optimizer
@@ -80,15 +81,15 @@ run:
   warmup_lr: 1e-6
 
   weight_decay: 0.05
-  max_epoch: 3
+  max_epoch: 5
   iters_per_epoch: 1000
   batch_size_train: 4
-  batch_size_eval: 4
+  batch_size_eval: 2
   num_workers: 4
-  warmup_steps: 1000
+  warmup_steps: 400
 
   seed: 42
-  output_dir: "output/video_llama_stage2_finetune"
+  output_dir: "output/audiobranch_stage2_finetune"
 
   amp: True
   resume_ckpt_path: null

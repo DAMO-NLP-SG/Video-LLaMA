@@ -5,7 +5,8 @@ Adapted from: https://github.com/Vision-CAIR/MiniGPT-4/blob/main/minigpt4/conver
 import argparse
 import time
 from PIL import Image
-
+import sys
+import os
 import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM, LlamaTokenizer
 from transformers import StoppingCriteria, StoppingCriteriaList
@@ -16,7 +17,9 @@ from typing import List, Tuple, Any
 import os
 from video_llama.common.registry import registry
 from video_llama.processors.video_processor import ToTHWC,ToUint8,load_video
-
+from video_llama.processors import Blip2ImageEvalProcessor
+            
+from video_llama.models.ImageBind.data import load_and_transform_audio_data
 class SeparatorStyle(Enum):
     """Different separator style."""
     SINGLE = auto()
@@ -134,6 +137,7 @@ class Chat:
         self.device = device
         self.model = model
         self.vis_processor = vis_processor
+        self.image_vis_processor = Blip2ImageEvalProcessor()
         stop_words_ids = [torch.tensor([835]).to(self.device),
                           torch.tensor([2277, 29937]).to(self.device)]  # '###' can be encoded in two different ways.
         self.stopping_criteria = StoppingCriteriaList([StoppingCriteriaSub(stops=stop_words_ids)])
@@ -181,33 +185,97 @@ class Chat:
         conv.messages[-1][1] = output_text
         return output_text, output_token.cpu().numpy()
     
+    def upload_video(self, video_path, conv, img_list):
+
+        msg = ""
+        if isinstance(video_path, str):  # is a video path
+            ext = os.path.splitext(video_path)[-1].lower()
+            print(video_path)
+            # image = self.vis_processor(image).unsqueeze(0).to(self.device)
+            video, msg = load_video(
+                video_path=video_path,
+                n_frms=8,
+                height=224,
+                width=224,
+                sampling ="uniform", return_msg = True
+            )
+            video = self.vis_processor.transform(video)
+            video = video.unsqueeze(0).to(self.device)
+            # print(image)
+        else:
+            raise NotImplementedError
+        
+        try:
+            audio_flag = 1
+            audio = load_and_transform_audio_data([video_path],"cpu",  clips_per_video=8)
+            audio = audio.to(self.device)
+        except :
+            print('no audio is found')
+            audio_flag = 0
+        finally:
+            if audio_flag == 1:
+                # image_emb, _ = self.model.encode_videoQformer_audiovideo(video,audio)
+                image_emb, _ = self.model.encode_videoQformer_visual(video)
+                audio_emb,_  = self.model.encode_audioQformer(audio)
+                img_list.append(image_emb)
+                img_list.append(audio_emb)
+                # conv.system = "You can understand the visual and audio content in the video that the user provides. Follow the instructions carefully and explain your answers in detail. "
+                # conv.append_message(conv.roles[0], "The audio of this video is <Video><ImageHere></Video> ")
+                conv.append_message(conv.roles[0], "<Video><ImageHere></Video> "+  'The audio of this video is <Video><ImageHere></Video> ')
+
+            else:  # only vison no audio
+                # conv.system = "You can understand the video that the user provides. Follow the instructions carefully and explain your answers in detail."
+                image_emb, _ = self.model.encode_videoQformer_visual(video)
+                img_list.append(image_emb)
+                conv.append_message(conv.roles[0], "<Video><ImageHere></Video> " )
+            return "Received."
+
+    def upload_video_without_audio(self, video_path, conv, img_list):
+        msg = ""
+        if isinstance(video_path, str):  # is a video path
+            ext = os.path.splitext(video_path)[-1].lower()
+            print(video_path)
+            # image = self.vis_processor(image).unsqueeze(0).to(self.device)
+            video, msg = load_video(
+                video_path=video_path,
+                n_frms=8,
+                height=224,
+                width=224,
+                sampling ="uniform", return_msg = True
+            )
+            video = self.vis_processor.transform(video)
+            video = video.unsqueeze(0).to(self.device)
+            # print(image)
+        else:
+            raise NotImplementedError
+        
+        
+        # conv.system = "You can understand the video that the user provides.  Follow the instructions carefully and explain your answers in detail."
+        image_emb, _ = self.model.encode_videoQformer_visual(video)
+        img_list.append(image_emb)
+        conv.append_message(conv.roles[0], "<Video><ImageHere></Video> "+ msg)
+        return "Received."
+
     def upload_img(self, image, conv, img_list):
 
         msg = ""
         if isinstance(image, str):  # is a image path
-            ext = os.path.splitext(image)[-1].lower()
-            if ext in ['.mp4', '.avi', '.mov']: # 视频
-                print(image)
-                # image = self.vis_processor(image).unsqueeze(0).to(self.device)
-                image, msg = load_video(
-                    video_path=image,
-                    n_frms=8,
-                    height=224,
-                    width=224,
-                    sampling ="uniform", return_msg = True
-                )
-                image = self.vis_processor.transform(image)
-                image = image.unsqueeze(0).to(self.device)
-                # print(image)
-            else:   # 图片
-                raw_image = Image.open(image).convert('RGB').unsqueeze(1) # 增加一个时间维度
-                image = self.vis_processor(raw_image).unsqueeze(0).to(self.device)
+            raw_image = Image.open(image).convert('RGB') # 增加一个时间维度
+            image = self.image_vis_processor(raw_image).unsqueeze(0).unsqueeze(2).to(self.device)
+        elif isinstance(image, Image.Image):
+            raw_image = image
+            image = self.image_vis_processor(raw_image).unsqueeze(0).unsqueeze(2).to(self.device)
+        elif isinstance(image, torch.Tensor):
+            if len(image.shape) == 3:
+                image = image.unsqueeze(0)
+            image = image.to(self.device)
         else:
             raise NotImplementedError
 
-        image_emb, _ = self.model.encode_img(image)
+        image_emb, _ = self.model.encode_videoQformer_visual(image)
         img_list.append(image_emb)
-        conv.append_message(conv.roles[0], "<Video><ImageHere></Video> "+ msg)
+        # Todo msg=""
+        conv.append_message(conv.roles[0], "<Image><ImageHere></Image> "+ msg)
 
         return "Received."
 

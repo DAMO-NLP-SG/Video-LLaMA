@@ -3,7 +3,7 @@ model:
   model_type: pretrain_vicuna
   freeze_vit: True
   freeze_qformer: True
-  
+  low_resource: False
 
   # Q-Former
   num_query_token: 32
@@ -11,12 +11,15 @@ model:
   # Vicuna
   llama_model: "ckpt/vicuna-13b/" or "ckpt/vicuna-7b/"
 
-  # llama project 
-  frozen_llama_proj: False
-
+  # only train audio branch
+  frozen_llama_proj: True
+  frozen_video_Qformer: True
+  frozen_audio_Qformer: False
+  
   fusion_head_layers: 2
   max_frame_pos: 32
   fusion_header_type: "seqTransf"
+  num_video_query_token: 32
 
 
 datasets:
@@ -34,7 +37,7 @@ datasets:
     text_processor:
       train:
         name: "blip_caption"
-  sample_ratio: 100
+    sample_ratio: 100
 
   cc_sbu_align:
     data_type: images
@@ -58,15 +61,15 @@ run:
   warmup_lr: 1e-6
 
   weight_decay: 0.05
-  max_epoch: 5
+  max_epoch: 3
   batch_size_train: 32
   batch_size_eval: 32
   num_workers: 8
-  warmup_steps: 2500
-  iters_per_epoch: 2500
+  warmup_steps: 5000
+  iters_per_epoch: 5000
 
   seed: 42
-  output_dir: "output/videollama_stage1_pretrain"
+  output_dir: "output/audiobranch_stage1_pretrain"
 
   amp: True
   resume_ckpt_path: null

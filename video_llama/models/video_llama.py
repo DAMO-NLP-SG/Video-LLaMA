@@ -14,6 +14,8 @@ from transformers import LlamaTokenizer,BertConfig
 import einops
 import copy
 from video_llama.models.Qformer import BertConfig, BertLMHeadModel
+from video_llama.models.ImageBind.models.imagebind_model import ImageBindModel,ModalityType
+from video_llama.models.ImageBind.models import imagebind_model
 # from flamingo_pytorch import PerceiverResampler
 @registry.register_model("video_llama")
 class VideoLLAMA(Blip2Base):
@@ -61,11 +63,15 @@ class VideoLLAMA(Blip2Base):
         device_8bit=0,  # the device of 8bit model should be set when loading and cannot be changed anymore.
 
         frozen_llama_proj=True,
+        frozen_video_Qformer=True,
+        frozen_audio_Qformer=True,
+        
         llama_proj_model='',
         fusion_header_type= "seqTransf",
         max_frame_pos= 32,
         fusion_head_layers = 2,
         num_video_query_token = 32,
+        num_audio_query_token = 8,
     ):
         super().__init__()
 
@@ -114,9 +120,13 @@ class VideoLLAMA(Blip2Base):
         if self.llama_tokenizer.pad_token is None:
             self.llama_tokenizer.pad_token = self.llama_tokenizer.eos_token 
         DEFAULT_IMAGE_PATCH_TOKEN = '<ImageHere>'
+        DEFAULT_AUDIO_PATCH_TOKEN = '<AudioHere>'
         self.llama_tokenizer.add_tokens([DEFAULT_IMAGE_PATCH_TOKEN], special_tokens=True)
-        self.IMAGE_PATCH_TOKEN_ID = self.llama_tokenizer.get_vocab()[DEFAULT_IMAGE_PATCH_TOKEN]
+        self.llama_tokenizer.add_tokens([DEFAULT_AUDIO_PATCH_TOKEN], special_tokens=True)
         
+        self.IMAGE_PATCH_TOKEN_ID = self.llama_tokenizer.get_vocab()[DEFAULT_IMAGE_PATCH_TOKEN]
+        self.AUDIO_PATCH_TOKEN_ID = self.llama_tokenizer.get_vocab()[DEFAULT_AUDIO_PATCH_TOKEN]
+
         logging.info('Loading LLAMA Model')
         if self.low_resource:
             self.llama_model = LlamaForCausalLM.from_pretrained(
@@ -171,6 +181,7 @@ class VideoLLAMA(Blip2Base):
             self.prompt_list = []
 
         self.video_frame_position_embedding = nn.Embedding(max_frame_pos, self.Qformer.config.hidden_size)
+
         self.num_video_query_token = num_video_query_token
         self.video_Qformer,self.video_query_tokens = self.init_video_Qformer(num_query_token = num_video_query_token,\
             vision_width=self.Qformer.config.hidden_size, num_hidden_layers =2)
@@ -183,17 +194,85 @@ class VideoLLAMA(Blip2Base):
             layer.intermediate = None
 
 
+        if frozen_video_Qformer:
+            #  todo frozen  llama_proj
+            for name, param in self.video_Qformer.named_parameters():
+                param.requires_grad = False
+            for name, param in self.video_frame_position_embedding.named_parameters():
+                param.requires_grad = False
+            self.video_query_tokens.requires_grad = False
+            
+            logging.info('video_Qformer is frozen')
+        else:
+            for name, param in self.video_Qformer.named_parameters():
+                param.requires_grad = True
+            for name, param in self.video_frame_position_embedding.named_parameters():
+                param.requires_grad = True
+            self.video_query_tokens.requires_grad = True
+            logging.info('video_Qformer is not frozen')
+
+        imagebind_ckpt_path = '/mnt/workspace/ckpt'
+        print (f'Initializing audio encoder from {imagebind_ckpt_path} ...')
+        self.audio_encoder,self.audio_hidden_size = \
+            imagebind_model.imagebind_huge()
+        self.audio_encoder.load_state_dict(torch.load("{}/imagebind_huge.pth".format(imagebind_ckpt_path)))
+        # free vision encoder
+        for name, param in self.audio_encoder.named_parameters():
+            param.requires_grad = False
+        self.audio_encoder.eval()
+        print ('audio encoder initialized.')
+        
+        self.num_audio_query_token = num_audio_query_token
+        self.audio_Qformer,self.audio_query_tokens = self.init_video_Qformer(num_query_token = self.num_audio_query_token,\
+            vision_width=self.audio_hidden_size, num_hidden_layers =2)
+        self.audio_Qformer.cls = None
+        self.audio_Qformer.bert.embeddings.word_embeddings = None
+        self.audio_Qformer.bert.embeddings.position_embeddings = None
+        for layer in self.audio_Qformer.bert.encoder.layer:
+            layer.output = None
+            layer.intermediate = None
+        self.audio_llama_proj = nn.Linear(
+            self.audio_Qformer.config.hidden_size, self.llama_model.config.hidden_size
+        )
+        self.audio_position_embedding = nn.Embedding(8, self.audio_hidden_size)
+
+        if frozen_video_Qformer and (not frozen_audio_Qformer):
+            self.train_flag = 1 # 只训练audio_Qformer
+        elif not(frozen_video_Qformer) and frozen_audio_Qformer:
+            self.train_flag = 0 # 训练video_Qformer
+        else:
+            self.train_flag = 2 # video_Qformer 
+            
+        if frozen_audio_Qformer:
+            #  todo frozen  llama_proj
+            for name, param in self.audio_Qformer.named_parameters():
+                param.requires_grad = False
+            self.audio_query_tokens.requires_grad = False
+            for name, param in self.audio_llama_proj.named_parameters():
+                param.requires_grad = False
+            for name, param in self.audio_position_embedding.named_parameters():
+                param.requires_grad = False
+            logging.info('audio_Qformer and audio-LLAMA proj is frozen')
+        else:
+            for name, param in self.audio_Qformer.named_parameters():
+                param.requires_grad = True
+            self.audio_query_tokens.requires_grad = True
+            for name, param in self.audio_llama_proj.named_parameters():
+                param.requires_grad = True
+            for name, param in self.audio_position_embedding.named_parameters():
+                param.requires_grad = True
+            logging.info('audio_Qformer is not frozen')
+
+
+        #  self.audio_hidden_size
     def vit_to_cpu(self):
         self.ln_vision.to("cpu")
         self.ln_vision.float()
         self.visual_encoder.to("cpu")
         self.visual_encoder.float()
 
-    def encode_img(self, image):
+    def encode_videoQformer_visual(self, image):
         device = image.device
-        if self.low_resource:
-            self.vit_to_cpu()
-            image = image.to("cpu")
         
         # input shape b,c,t,h,w
         batch_size,_,time_length,_,_ = image.size()
@@ -226,9 +305,6 @@ class VideoLLAMA(Blip2Base):
             frame_atts = torch.ones(frame_hidden_state.size()[:-1], dtype=torch.long).to(device)
             video_query_tokens = self.video_query_tokens.expand(frame_hidden_state.shape[0], -1, -1)
 
-            # print('attention')
-            # print(video_query_tokens.size())
-            # print(frame_hidden_state.size())
             video_query_output = self.video_Qformer.bert(
                 query_embeds=video_query_tokens,
                 encoder_hidden_states=frame_hidden_state,
@@ -240,6 +316,7 @@ class VideoLLAMA(Blip2Base):
             inputs_llama = self.llama_proj(video_hidden)
             atts_llama = torch.ones(inputs_llama.size()[:-1], dtype=torch.long).to(image_embeds.device)
         return inputs_llama, atts_llama
+    
     
     def prompt_wrap(self, img_embeds, atts_img, prompt):
         if prompt:
@@ -258,18 +335,107 @@ class VideoLLAMA(Blip2Base):
             return wrapped_img_embeds, wrapped_atts_img
         else:
             return img_embeds, atts_img
+    #  input audio shape [b t c h w] 
+    def encode_audioQformer(self, audio,modality_type=ModalityType.AUDIO):
+        device = audio.device
+        with self.maybe_autocast():
+            audio_feature, audio_imagebind_finalout = self.audio_encoder.get_audio_feature(audio,modality_type=modality_type)
+            batch_size,time_length = audio.size()[:2]
+
+
+            position_ids = torch.arange(time_length, dtype=torch.long, device=device)
+            position_ids = position_ids.unsqueeze(0).expand(batch_size, -1)
+
+            audio_position_embeddings = self.audio_position_embedding(position_ids)
+            audio_imagebind_finalout = audio_imagebind_finalout + audio_position_embeddings
+
+            audio_query_tokens = self.audio_query_tokens.expand(audio_imagebind_finalout.shape[0], -1, -1)
+            frame_atts = torch.ones(audio_imagebind_finalout.size()[:-1], dtype=torch.long).to(device)
+
+            audio_query_output = self.audio_Qformer.bert(
+                query_embeds=audio_query_tokens, #[32,768]
+                encoder_hidden_states=audio_imagebind_finalout,
+                encoder_attention_mask=frame_atts,
+                return_dict=True,
+                )
+            audio_hidden = audio_query_output.last_hidden_state
+
+            inputs_llama = self.audio_llama_proj(audio_hidden)
+            atts_llama = torch.ones(inputs_llama.size()[:-1], dtype=torch.long).to(device)
+    
+        return inputs_llama, atts_llama
+
+    def encode_videoQformer_audiovideo(self, image, audio):
+        device = image.device
+        
+        # input shape b,c,t,h,w
+        batch_size,_,time_length,_,_ = image.size()
+        image = einops.rearrange(image, 'b c t h w -> (b t) c h w')
+        with self.maybe_autocast():
+            # embed image features with blip2, out: (b t) q h
+            image_embeds = self.ln_vision(self.visual_encoder(image)).to(device)
+            image_atts = torch.ones(image_embeds.size()[:-1], dtype=torch.long).to(device)
+
+            query_tokens = self.query_tokens.expand(image_embeds.shape[0], -1, -1)
+            query_output = self.Qformer.bert(
+                query_embeds=query_tokens,
+                encoder_hidden_states=image_embeds,
+                encoder_attention_mask=image_atts,
+                return_dict=True,
+            )
+            
+            # add frame_pos embedding
+            position_ids = torch.arange(time_length, dtype=torch.long, device=query_tokens.device)
+            position_ids = position_ids.unsqueeze(0).expand(batch_size, -1)
+            frame_position_embeddings = self.video_frame_position_embedding(position_ids)
+            q_hidden_state = query_output.last_hidden_state
+
+            frame_position_embeddings = frame_position_embeddings.unsqueeze(-2)
+            frame_hidden_state = einops.rearrange(q_hidden_state, '(b t) q h -> b t q h',b=batch_size,t=time_length)
+            frame_hidden_state = frame_position_embeddings + frame_hidden_state
+
+            # encode audio 
+            audio_feature, audio_imagebind_finalout = self.audio_encoder.get_audio_feature(audio,modality_type=ModalityType.AUDIO) # [batch,8*1,768]    8*32, 768
+            audio_frame_position_embeddings = frame_position_embeddings.squeeze(-2)
+            audio_feature = audio_feature + audio_frame_position_embeddings
+
+            # frame attention a
+            frame_hidden_state =  einops.rearrange(frame_hidden_state, 'b t q h -> b (t q) h',b=batch_size,t=time_length)
+            frame_hidden_state = torch.cat([frame_hidden_state,audio_feature],dim = 1)
+            video_query_tokens = self.video_query_tokens.expand(frame_hidden_state.shape[0], -1, -1)
+            frame_atts = torch.ones(frame_hidden_state.size()[:-1], dtype=torch.long).to(device)
+
+            video_query_output = self.video_Qformer.bert(
+                query_embeds=video_query_tokens, #[32,768]
+                encoder_hidden_states=frame_hidden_state,
+                encoder_attention_mask=frame_atts,
+                return_dict=True,
+                )
+            video_hidden = video_query_output.last_hidden_state
+
+            inputs_llama = self.llama_proj(video_hidden)
+            atts_llama = torch.ones(inputs_llama.size()[:-1], dtype=torch.long).to(image_embeds.device)
+    
+        return inputs_llama, atts_llama
 
     def forward(self, samples):
         if 'conv_type' in samples.keys() and samples['conv_type']=='multi':
-            num_patch_tokens = self.num_video_query_token
+            
             im_patch_token_id = self.IMAGE_PATCH_TOKEN_ID
             image = samples["images"]
             input_ids = samples['input_ids']
             if len(image.size())==4:
                 time = 1
                 image = einops.repeat(image, 'b c h w -> b c t h w',t = time)
-            img_embeds, atts_img = self.encode_img(image)
 
+            if self.train_flag == 0:
+                num_patch_tokens = self.num_video_query_token
+                img_embeds, atts_img = self.encode_videoQformer_visual(image)
+            elif self.train_flag == 1:
+                num_patch_tokens = self.num_audio_query_token
+                image = einops.rearrange(image, 'b c t h w -> b t c h w')
+                img_embeds, atts_img = self.encode_audioQformer(image, modality_type=ModalityType.VISION)
+                
             temp_input_ids = copy.deepcopy(input_ids)
             temp_input_ids[temp_input_ids == im_patch_token_id] = 0
             temp_input_embedding = self.llama_model.model.embed_tokens(temp_input_ids)
@@ -288,7 +454,7 @@ class VideoLLAMA(Blip2Base):
                 
                 cur_new_input_embeds = torch.cat((cur_input_embeds[:mask_index_start], cur_image_features, cur_input_embeds[mask_index_start+num_patch_tokens:]), dim=0)
                 new_input_embeds.append(cur_new_input_embeds)
-
+                
                 cur_image_idx+=1
             inputs_embeds = torch.stack(new_input_embeds, dim=0)
             targets = samples['labels']
@@ -308,9 +474,13 @@ class VideoLLAMA(Blip2Base):
             if len(image.size()) != 5:
                 time = 1
                 image = einops.repeat(image, 'b c h w -> b c t h w',t = time)
-                
-            img_embeds, atts_img = self.encode_img(image)
             
+            if self.train_flag == 1:
+                image = einops.rearrange(image, 'b c t h w -> b t c h w')
+                img_embeds, atts_img = self.encode_audioQformer(image, modality_type=ModalityType.VISION)
+            elif self.train_flag == 0:
+                img_embeds, atts_img = self.encode_videoQformer_visual(image)
+
             if self.prompt_list:
                 prompt = random.choice(self.prompt_list)
                 img_embeds, atts_img = self.prompt_wrap(img_embeds, atts_img, prompt)
@@ -383,13 +553,16 @@ class VideoLLAMA(Blip2Base):
         end_sym = cfg.get("end_sym", '\n')
         
         frozen_llama_proj = cfg.get("frozen_llama_proj", True)
+        frozen_video_Qformer = cfg.get("frozen_video_Qformer", True)
+        frozen_audio_Qformer = cfg.get("frozen_audio_Qformer", True)
+
         llama_proj_model = cfg.get("llama_proj_model", '')
 
         fusion_header_type = cfg.get("fusion_header_type", 'seqTransf')
         max_frame_pos = cfg.get("max_frame_pos", 32)
         fusion_head_layers = cfg.get("fusion_head_layers", 2)
         num_video_query_token =  cfg.get("num_video_query_token", 32)
-
+        num_audio_query_token =  cfg.get("num_audio_query_token", 8)
         model = cls(
             vit_model=vit_model,
             q_former_model=q_former_model,
@@ -411,12 +584,20 @@ class VideoLLAMA(Blip2Base):
             max_frame_pos=max_frame_pos,
             fusion_head_layers=fusion_head_layers,
             frozen_llama_proj=frozen_llama_proj,
-            num_video_query_token=num_video_query_token
+            frozen_video_Qformer=frozen_video_Qformer,
+            frozen_audio_Qformer=frozen_audio_Qformer,
+            num_video_query_token=num_video_query_token,
+            num_audio_query_token = num_audio_query_token,
         )
 
         ckpt_path = cfg.get("ckpt", "")  # load weights of MiniGPT-4
         if ckpt_path:
-            print("Load BLIP2-LLM Checkpoint: {}".format(ckpt_path))
+            print("Load first Checkpoint: {}".format(ckpt_path))
             ckpt = torch.load(ckpt_path, map_location="cpu")
+            msg = model.load_state_dict(ckpt['model'], strict=False)
+        ckpt_path_2 = cfg.get("ckpt_2", "")  
+        if ckpt_path_2:
+            print("Load second Checkpoint: {}".format(ckpt_path_2))
+            ckpt = torch.load(ckpt_path_2, map_location="cpu")
             msg = model.load_state_dict(ckpt['model'], strict=False)
         return model
