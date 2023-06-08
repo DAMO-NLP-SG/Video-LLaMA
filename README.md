@@ -7,7 +7,7 @@
 # Video-LLaMA: An Instruction-tuned Audio-Visual Language Model for Video Understanding
 <!-- **Video-LLaMA: An Instruction-tuned Audio-Visual Language Model for Video Understanding** -->
 
-This is the repo for the Video-LLaMA project, which is working on empowering large language models with video understanding capability. 
+This is the repo for the Video-LLaMA project, which is working on empowering large language models with video and audio understanding capability. 
 
 <div style='display:flex; gap: 0.25rem; '>
 <a href='https://huggingface.co/spaces/DAMO-NLP-SG/Video-LLaMA'><img src='https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Demo-blue'></a>
