@@ -69,7 +69,12 @@ The checkpoint stores only learnable parameters (frame embeddings, one two-layer
 ## Usage
 ### Enviroment Preparation 
 
-First, you should create a conda environment:
+First, install ffmpeg
+```
+apt update
+apt install ffmpeg
+```
+Then, create a conda environment:
 ```
 conda env create -f environment.yml
 conda activate videollama
@@ -90,6 +95,7 @@ python apply_delta.py \
 ```
 
 - Download the MiniGPT-4 model (trained linear layer) from this [link](https://drive.google.com/file/d/1a4zLvaiDBr-36pasffmgpvH5P7CKmpze/view).
+- Download the weight of ImageBind from this [link](https://github.com/facebookresearch/ImageBind) 
 
 ## Download Learnable Weights
 Use `git-lfs` to download the learnable weights of our Video-LLaMA (i.e., frame embeddings + Video Q-Former + linear projector):
