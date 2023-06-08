@@ -35,14 +35,14 @@ This is the repo for the Video-LLaMA project, which is working on empowering lar
 
 
 - Video-LLaMA is built on top of [BLIP-2](https://github.com/salesforce/LAVIS/tree/main/projects/blip2) and [MiniGPT-4](https://github.com/Vision-CAIR/MiniGPT-4). It is composed of two core components: (1) Vision-Language (VL) Branch and (2) Audio-Language (AL) Branch.
-  - VL Branch (Visual encoder: ViT-G/14 + BLIP-2 Q-Former)
+  - **VL Branch** (Visual encoder: ViT-G/14 + BLIP-2 Q-Former)
     - A two-layer video Q-Former and a frame embedding layer (applied to the embeddings of each frame) are introduced to compute video representations. 
     - We train VL Branch on the Webvid-2M video caption dataset with a video-to-text generation task. We also add image-text pairs (~595K image captions from [LLaVA](https://github.com/haotian-liu/LLaVA)) into the pre-training dataset to enhance the understanding of static visual concepts.
     - After pre-training, we further fine-tune our VL Branch using the instruction-tuning data from [MiniGPT-4](https://github.com/Vision-CAIR/MiniGPT-4), [LLaVA](https://github.com/haotian-liu/LLaVA) and [VideoChat](https://github.com/OpenGVLab/Ask-Anything). 
-  - AL Branch (Audio encoder: ImageBind-Huge) 
+  - **AL Branch** (Audio encoder: ImageBind-Huge) 
     - A two-layer audio Q-Former and a audio segment embedding layer (applied to the embedding of each audio segment) are introduced to compute audio representations.
-    - Due to the lack of audio captioning data, we have to train AL Branch on video/image caption data only.  
-- Note that only the Video/Audio Q-Formers, positional embedding layers and the linear layers are trainable during cross-modal training. in both pre-training and instruction-tuning stages, such components serve as the "adapter" between video and text. 
+    - As the used audio encoder (i.e., ImageBind) is already aligned across multiple modalities, we train AL Branch on video/image instrucaption data only, just to connect the output of ImageBind to language decoder.    
+- Note that only the Video/Audio Q-Formers, positional embedding layers and the linear layers are trainable during cross-modal training.
 
 
 
