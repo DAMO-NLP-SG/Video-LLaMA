@@ -46,5 +46,4 @@ video_llama/configs/datasets/instruct/valor_instruct.yaml
 video_llama/configs/datasets/instruct/avsd_instruct.yaml
 video_llama/datasets/datasets/audio_video_dataset.py
 video_llama/datasets/builders/audio_backup_instruct_builder.py
-requirement.txt
 demo_audiovideo.py

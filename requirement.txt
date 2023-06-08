@@ -1,0 +1,17 @@
+tqdm
+decord
+timm
+einops
+opencv_python
+torchvision
+
+bitsandbytes
+omegaconf
+iopath
+webdataset
+ftfy
+SentencePiece
+transformers==4.28.0
+gradio==3.24.1
+pytorchvideo
+gradio-client==0.0.8

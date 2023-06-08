@@ -62,3 +62,5 @@ dependencies:
     - gradio-client==0.0.8
     - wandb
     - einops
+    - SentencePiece
+    - 
