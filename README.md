@@ -42,7 +42,7 @@ This is the repo for the Video-LLaMA project, which is working on empowering lar
   - **AL Branch** (Audio encoder: ImageBind-Huge) 
     - A two-layer audio Q-Former and a audio segment embedding layer (applied to the embedding of each audio segment) are introduced to compute audio representations.
     - As the used audio encoder (i.e., ImageBind) is already aligned across multiple modalities, we train AL Branch on video/image instrucaption data only, just to connect the output of ImageBind to language decoder.    
-- Note that only the Video/Audio Q-Formers, positional embedding layers and the linear layers are trainable during cross-modal training.
+- Note that only the Video/Audio Q-Former, positional embedding layers and the linear layers are trainable during cross-modal training.
 
 
 
@@ -55,7 +55,7 @@ https://github.com/DAMO-NLP-SG/Video-LLaMA/assets/21003563/9a34cfb0-cb97-43ec-87
 
 ## Pre-trained & Fine-tuned Checkpoints
 
-The following checkpoints store learnable parameters (positional embedding layers, video/audio Q-former and linear projection layers) only.
+The following checkpoints store learnable parameters (positional embedding layers, Video/Audio Q-former and linear projection layers) only.
 
 #### Vision-Language Branch
 | Checkpoint       | Link | Note |
@@ -77,7 +77,7 @@ The following checkpoints store learnable parameters (positional embedding layer
 
 
 ## Usage
-### Enviroment Preparation 
+#### Enviroment Preparation 
 
 First, install ffmpeg
 ```
@@ -94,8 +94,11 @@ conda activate videollama
 ## Prerequisites
 
 Before using the repository, make sure you have obtained the following checkpoints:
+
+#### Pre-trained Language Decoder
+
 - Get the original LLaMA weights in the huggingface format by following the instructions [here](https://huggingface.co/docs/transformers/main/model_doc/llama).
-- Download [Vicuna delta weights](https://huggingface.co/lmsys/vicuna-13b-delta-v0). 
+- Download Vicuna delta weights :point_right: [[7B](https://huggingface.co/lmsys/vicuna-7b-delta-v0)][[13B](https://huggingface.co/lmsys/vicuna-13b-delta-v0)]. 
 - Use the following command to add delta weights to the original LLaMA weights to obtain the Vicuna weights:
 
 ```
@@ -104,18 +107,22 @@ python apply_delta.py \
     --target /output/path/to/vicuna-13b --delta /path/to/vicuna-13b-delta
 ```
 
+#### Pre-trained Visual Encoder in Vision-Language Branch
 - Download the MiniGPT-4 model (trained linear layer) from this [link](https://drive.google.com/file/d/1a4zLvaiDBr-36pasffmgpvH5P7CKmpze/view).
-- Download the weight of ImageBind from this [link](https://github.com/facebookresearch/ImageBind) 
+
+#### Pre-trained Audio Encoder in Audio-Language Branch
+- Download the weight of ImageBind from this [link](https://github.com/facebookresearch/ImageBind). 
 
 ## Download Learnable Weights
-Use `git-lfs` to download the learnable weights of our Video-LLaMA (i.e., frame embeddings + Video Q-Former + linear projector):
+Use `git-lfs` to download the learnable weights of our Video-LLaMA (i.e., positional embedding layer + Q-Former + linear projection layer):
 ```bash
 git lfs install
 git clone https://huggingface.co/DAMO-NLP-SG/Video-LLaMA-Series
 ```
-The above commands will download the model weights of all the Video-LLaMA variants. For sure, you can choose to download the weights on demand. For example, if you want to run Video-LLaMA-v2 with Vicuna-13B as language decoder locally, then:
+The above commands will download the model weights of all the Video-LLaMA variants. For sure, you can choose to download the weights on demand. For example, if you want to run Video-LLaMA with Vicuna-7B as language decoder locally, then:
 ```bash
-wget https://huggingface.co/DAMO-NLP-SG/Video-LLaMA-Series/resolve/main/finetune-vicuna13b-v2.pth
+wget https://huggingface.co/DAMO-NLP-SG/Video-LLaMA-Series/resolve/main/finetune-vicuna7b-v2.pth
+wget https://huggingface.co/DAMO-NLP-SG/Video-LLaMA-Series/resolve/main/finetune_vicuna7b_audiobranch.pth
 ```
 should meet the requirement.
 
