@@ -65,6 +65,6 @@ dependencies:
     - einops
     - SentencePiece
     - ftfy
-    - pytorchvideo=0.1.5
+    - pytorchvideo==0.1.5
 
 
