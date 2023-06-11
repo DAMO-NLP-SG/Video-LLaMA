@@ -98,7 +98,7 @@ The following checkpoints store learnable parameters (positional embedding layer
 ## Usage
 #### Enviroment Preparation 
 
-First, install ffmpeg
+First, install ffmpeg.
 ```
 apt update
 apt install ffmpeg
@@ -182,7 +182,7 @@ The folder structure of the dataset is shown below:
 |────...
 ```
 #### Script
-Config the the checkpoint and dataset paths in [video_llama_stage1_pretrain.yaml](./train_configs/video_llama_stage1_pretrain.yaml)
+Config the the checkpoint and dataset paths in [video_llama_stage1_pretrain.yaml](./train_configs/video_llama_stage1_pretrain.yaml).
 Run the script:
 ```
 conda activate videollama
@@ -197,7 +197,7 @@ For now, the fine-tuning dataset consists of:
 * 11K video-based instructions from VideoChat [[link](https://github.com/OpenGVLab/InternVideo/tree/main/Data/instruction_data)]
 
 #### Script
-Config the the checkpoint and dataset paths in [video_llama_stage2_finetune.yaml](./train_configs/video_llama_stage2_finetune.yaml)
+Config the the checkpoint and dataset paths in [video_llama_stage2_finetune.yaml](./train_configs/video_llama_stage2_finetune.yaml).
 ```
 conda activate videollama
 torchrun --nproc_per_node=8 train.py --cfg-path  ./train_configs/video_llama_stage2_finetune.yaml
