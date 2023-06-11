@@ -478,7 +478,7 @@ class VideoLLAMA(Blip2Base):
             if self.train_flag == 1:
                 image = einops.rearrange(image, 'b c t h w -> b t c h w')
                 img_embeds, atts_img = self.encode_audioQformer(image, modality_type=ModalityType.VISION)
-            elif self.train_flag == 0:
+            else:
                 img_embeds, atts_img = self.encode_videoQformer_visual(image)
 
             if self.prompt_list:
