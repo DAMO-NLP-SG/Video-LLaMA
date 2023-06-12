@@ -156,13 +156,13 @@ python demo_audiovideo.py \
 
 ## Training
 
-The training of Video-LLaMA consists of two stages,
+The training of each cross-modal branch (i.e., VL branch or AL branch) in Video-LLaMA consists of two stages,
 
-1. Pre-training on the Webvid-2.5M video caption dataset and LLaVA-CC3M image caption dataset.
+1. Pre-training on the [Webvid-2.5M](https://github.com/m-bain/webvid) video caption dataset and [LLaVA-CC3M]((https://github.com/haotian-liu/LLaVA)) image caption dataset.
 
-2. Fine-tuning using the image-based instruction-tuning data from MiniGPT-4.
+2. Fine-tuning using the image-based instruction-tuning data from [MiniGPT-4](https://github.com/Vision-CAIR/MiniGPT-4)/[LLaVA](https://github.com/haotian-liu/LLaVA) and the video-based instruction-tuning data from [VideoChat](https://github.com/OpenGVLab/Ask-Anything).
 
-### 1. Vision-Language Pre-training
+### 1. Pre-training
 #### Data Preparation
 Download the metadata and video following the instruction from the official Github repo of [Webvid](https://github.com/m-bain/webvid).
 The folder structure of the dataset is shown below:
