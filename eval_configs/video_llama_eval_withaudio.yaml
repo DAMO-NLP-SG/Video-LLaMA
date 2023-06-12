@@ -16,7 +16,7 @@ model:
   max_frame_pos: 32
   fusion_header_type: "seqTransf"
 
-  ckpt: /path/to/pretrained/ckpt/
+  ckpt: path/visual_branch_ckpt/
   ckpt_2: path/audio_branch_ckpt/
 
 
