@@ -5,7 +5,7 @@ model:
   freeze_qformer: True
   max_txt_len: 160
   end_sym: "###"
-  low_resource: True
+  low_resource: False
 
   frozen_llama_proj: False
 
