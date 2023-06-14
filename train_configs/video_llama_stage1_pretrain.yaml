@@ -34,7 +34,7 @@ datasets:
     text_processor:
       train:
         name: "blip_caption"
-  sample_ratio: 100
+    sample_ratio: 100
 
   cc_sbu_align:
     data_type: images
