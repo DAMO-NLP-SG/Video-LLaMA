@@ -7,7 +7,7 @@
 # Video-LLaMA: An Instruction-tuned Audio-Visual Language Model for Video Understanding
 <!-- **Video-LLaMA: An Instruction-tuned Audio-Visual Language Model for Video Understanding** -->
 
-This is the repo for the Video-LLaMA project, which is working on empowering large language models with video and audio understanding capability. 
+This is the repo for the Video-LLaMA project, which is working on empowering large language models with video and audio understanding capabilities. 
 
 <div style='display:flex; gap: 0.25rem; '>
 <a href='https://huggingface.co/spaces/DAMO-NLP-SG/Video-LLaMA'><img src='https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Demo-blue'></a>
@@ -199,11 +199,16 @@ For now, the fine-tuning dataset consists of:
 * 11K video-based instructions from VideoChat [[link](https://github.com/OpenGVLab/InternVideo/tree/main/Data/instruction_data)]
 
 #### Script
-Config the the checkpoint and dataset paths in [video_llama_stage2_finetune.yaml](./train_configs/video_llama_stage2_finetune.yaml).
+Config the checkpoint and dataset paths in [video_llama_stage2_finetune.yaml](./train_configs/video_llama_stage2_finetune.yaml).
 ```
 conda activate videollama
 torchrun --nproc_per_node=8 train.py --cfg-path  ./train_configs/video_llama_stage2_finetune.yaml
 ```
+
+## Recommended GPUs
+* Pre-training: 8xA100 (80G)
+* Instruction-tuning: 8xA100 (80G)
+* Inference: 1xA100 (40G/80G) or 1xA6000
 
 ## Acknowledgement
 We are grateful for the following awesome projects our Video-LLaMA arising from:
