@@ -563,7 +563,7 @@ class VideoLLAMA(Blip2Base):
         fusion_head_layers = cfg.get("fusion_head_layers", 2)
         num_video_query_token =  cfg.get("num_video_query_token", 32)
         num_audio_query_token =  cfg.get("num_audio_query_token", 8)
-        imagebind_ckpt_path = cfg.get("imagebind_ckpt_path", 8)
+        imagebind_ckpt_path = cfg.get("imagebind_ckpt_path", '/mnt/workspace/ckpt')
         model = cls(
             vit_model=vit_model,
             q_former_model=q_former_model,
