@@ -13,6 +13,7 @@ model:
   imagebind_ckpt_path: "ckpt/imagebind_path/"
   
   # only train vision branch
+  llama_proj_model: 'ckpt/pretrained_minigpt4.pth'
   frozen_llama_proj: False
   frozen_video_Qformer: False
   frozen_audio_Qformer: True
