@@ -10,14 +10,22 @@ model:
 
   # Vicuna
   llama_model: "ckpt/vicuna-13b/" or "ckpt/vicuna-7b/"
-
-  # llama project 
+  imagebind_ckpt_path: "ckpt/imagebind_path/"
+  
+  # only train vision branch
   frozen_llama_proj: False
-
+  frozen_video_Qformer: False
+  frozen_audio_Qformer: True
+  
   fusion_head_layers: 2
   max_frame_pos: 32
   fusion_header_type: "seqTransf"
 
+  
+  fusion_head_layers: 2
+  max_frame_pos: 32
+  fusion_header_type: "seqTransf"
+  num_video_query_token: 32v
 
 datasets:
   webvid:
