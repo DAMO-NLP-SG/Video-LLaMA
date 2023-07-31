@@ -27,10 +27,19 @@ image_conversation = Conversation(
     sep_style=SeparatorStyle.SINGLE,
     sep="###",
 )
+llama_v2_image_conversation = Conversation(
+    system=" ",
+    roles=("USER", "ASSISTANT"),
+    messages=(),
+    offset=0,
+    sep_style=SeparatorStyle.LLAMA_2,
+    sep="<s>",
+    sep2="</s>",
+)
 IGNORE_INDEX = -100
 
 class Instruct_Dataset(BaseDataset):
-    def __init__(self, vis_processor, text_processor, vis_root, ann_root,num_video_query_token=32,tokenizer_name = '/mnt/workspace/ckpt/vicuna-13b/',data_type = 'image'):
+    def __init__(self, vis_processor, text_processor, vis_root, ann_root,num_video_query_token=32,tokenizer_name = '/mnt/workspace/ckpt/vicuna-13b/',data_type = 'image', model_type='vicuna'):
         """
         vis_root (string): Root directory of Llava images (e.g. webvid_eval/video/)
         ann_root (string): Root directory of video (e.g. webvid_eval/annotations/)
@@ -46,7 +55,7 @@ class Instruct_Dataset(BaseDataset):
         self.resize_size = 224
         self.num_frm = 8
         self.tokenizer = LlamaTokenizer.from_pretrained(tokenizer_name, use_fast=False)
-        self.tokenizer.pad_token = self.tokenizer.eos_token
+        self.tokenizer.pad_token = self.tokenizer.unk_token
         self.tokenizer.add_tokens([DEFAULT_IMAGE_PATCH_TOKEN], special_tokens=True)
         self.num_video_query_token = num_video_query_token
         self.IMAGE_PATCH_TOKEN_ID = self.tokenizer.get_vocab()[DEFAULT_IMAGE_PATCH_TOKEN]
@@ -55,6 +64,7 @@ class Instruct_Dataset(BaseDataset):
             image_size=self.resize_size, n_frms = self.num_frm
         ).transform
         self.data_type = data_type
+        self.model_type = model_type
 
     def _get_image_path(self, sample):
         rel_video_fp ='COCO_train2014_' + sample['image']
@@ -74,9 +84,17 @@ class Instruct_Dataset(BaseDataset):
                 image = self.vis_processor(image)
                 # text = self.text_processor(text)
                 sources = preprocess_multimodal(copy.deepcopy(conversation_list), None, cur_token_len=self.num_video_query_token)
-                data_dict = preprocess(
-                    sources,
-                    self.tokenizer)
+                if self.model_type =='vicuna':
+                    data_dict = preprocess(
+                        sources,
+                        self.tokenizer)
+                elif  self.model_type =='llama_v2':
+                    data_dict = preprocess_for_llama_v2(
+                        sources,
+                        self.tokenizer)
+                else:
+                    print('not support')
+                    raise('not support')
                 data_dict = dict(input_ids=data_dict["input_ids"][0],
                                 labels=data_dict["labels"][0])
 
@@ -138,7 +156,7 @@ def preprocess_multimodal(
     image_token_len = cur_token_len
 
     for sentence in conversation_list:
-        replace_token = '<Image>'+DEFAULT_IMAGE_PATCH_TOKEN * image_token_len+'/<Image>'
+        replace_token = '<Image>'+DEFAULT_IMAGE_PATCH_TOKEN * image_token_len+'</Image>'
         sentence["value"] = sentence["value"].replace(DEFAULT_IMAGE_TOKEN, replace_token)
 
     return [conversation_list]
@@ -215,6 +233,71 @@ def preprocess(
                                       tokenizer)["input_ids_lens"]
         speakers = [sentence["from"] for sentence in source]
         _mask_targets(target, tokenized_lens, speakers)
+
+    return dict(input_ids=input_ids, labels=targets)
+
+def preprocess_for_llama_v2(
+    sources: Sequence[str],
+    tokenizer: transformers.PreTrainedTokenizer,
+) -> Dict:
+    """
+    Given a list of sources, each is a conversation list. This transform:
+    1. Add signal '### ' at the beginning each sentence, with end signal '\n';
+    2. Concatenate conversations together;
+    3. Tokenize the concatenated conversation;
+    4. Make a deepcopy as the target. Mask human words with IGNORE_INDEX.
+    """
+    # add end signal and concatenate together
+    conversations = []
+    conv = copy.deepcopy(llama_v2_image_conversation.copy())
+    roles = {"human": conv.roles[0], "gpt": conv.roles[1]}
+    for source in sources:
+        # <s>[INST] <<SYS>>\n{system_prompt}\n<</SYS>>\n\n
+        header = f"<s>[INST] <<SYS>>\n{conv.system}\n</SYS>>\n\n"
+
+        if roles[source[0]["from"]] != conv.roles[0]:
+            # Skip the first one if it is not from human
+            source = source[1:]
+        conv.messages = []
+        for j, sentence in enumerate(source):
+            role = roles[sentence["from"]]
+            assert role == conv.roles[j % 2]
+            conv.append_message(role, sentence["value"])
+        conversations.append(conv.get_prompt())
+
+    input_ids = tokenizer(
+            conversations,
+            return_tensors="pt",
+            padding="longest",
+            max_length=512,
+            truncation=True,
+        ).input_ids
+    targets = copy.deepcopy(input_ids)
+
+
+    sep = "[/INST] "
+    for conversation, target in zip(conversations, targets):
+        # total_len = int(target.ne(tokenizer.pad_token_id).sum())
+        rounds = conversation.split(conv.sep2)
+        cur_len = 1
+        target[:cur_len] = IGNORE_INDEX
+        for i, rou in enumerate(rounds):
+            if rou == "":
+                break
+
+            parts = rou.split(sep)
+            if len(parts) != 2:
+                break
+            parts[0] += sep
+
+            
+            round_len = len(tokenizer(rou).input_ids)
+            instruction_len = len(tokenizer(parts[0]).input_ids) - 2 # 为什么减去2,speical token 的数目
+
+            target[cur_len : cur_len + instruction_len] = IGNORE_INDEX
+
+            cur_len += round_len
+        target[cur_len:] = IGNORE_INDEX
 
     return dict(input_ids=input_ids, labels=targets)
 
