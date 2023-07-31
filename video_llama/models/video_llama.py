@@ -119,7 +119,7 @@ class VideoLLAMA(Blip2Base):
         logging.info('Loading LLAMA Tokenizer')
         self.llama_tokenizer = LlamaTokenizer.from_pretrained(llama_model, use_fast=False)
         if self.llama_tokenizer.pad_token is None:
-            self.llama_tokenizer.pad_token = self.llama_tokenizer.eos_token 
+            self.llama_tokenizer.pad_token = self.llama_tokenizer.unk_token 
         DEFAULT_IMAGE_PATCH_TOKEN = '<ImageHere>'
         DEFAULT_AUDIO_PATCH_TOKEN = '<AudioHere>'
         self.llama_tokenizer.add_tokens([DEFAULT_IMAGE_PATCH_TOKEN], special_tokens=True)
@@ -132,14 +132,14 @@ class VideoLLAMA(Blip2Base):
         if self.low_resource:
             self.llama_model = LlamaForCausalLM.from_pretrained(
                 llama_model,
-                torch_dtype=torch.float16,
+                torch_dtype=torch.bfloat16,
                 load_in_8bit=True,
                 device_map={'': device_8bit}
             )
         else:
             self.llama_model = LlamaForCausalLM.from_pretrained(
                 llama_model,
-                torch_dtype=torch.float16,
+                torch_dtype=torch.bfloat16,
             )
 
         for name, param in self.llama_model.named_parameters():
