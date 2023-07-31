@@ -13,7 +13,7 @@ import gradio as gr
 from video_llama.common.config import Config
 from video_llama.common.dist_utils import get_rank
 from video_llama.common.registry import registry
-from video_llama.conversation.conversation_video import Chat, Conversation, default_conversation,SeparatorStyle
+from video_llama.conversation.conversation_video import Chat, Conversation, default_conversation,SeparatorStyle,conv_llava_llama_2
 import decord
 decord.bridge.set_bridge('torch')
 
@@ -30,6 +30,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Demo")
     parser.add_argument("--cfg-path", default='eval_configs/video_llama_eval_withaudio.yaml', help="path to configuration file.")
     parser.add_argument("--gpu-id", type=int, default=0, help="specify the gpu to load the model.")
+    parser.add_argument("--model_type", type=str, default='vicuna', help="The type of LLM")
     parser.add_argument(
         "--options",
         nargs="+",
@@ -82,35 +83,23 @@ def gradio_reset(chat_state, img_list):
     return None, gr.update(value=None, interactive=True), gr.update(value=None, interactive=True), gr.update(placeholder='Please upload your video first', interactive=False),gr.update(value="Upload & Start Chat", interactive=True), chat_state, img_list
 
 def upload_imgorvideo(gr_video, gr_img, text_input, chat_state,chatbot,audio_flag):
+    if args.model_type == 'vicuna':
+        chat_state = default_conversation.copy()
+    else:
+        chat_state = conv_llava_llama_2.copy()
     if gr_img is None and gr_video is None:
         return None, None, None, gr.update(interactive=True), chat_state, None
     elif gr_img is not None and gr_video is None:
         print(gr_img)
         chatbot = chatbot + [((gr_img,), None)]
-        chat_state = Conversation(
-            system= "You are able to understand the visual content that the user provides."
-           "Follow the instructions carefully and explain your answers in detail.",
-            roles=("Human", "Assistant"),
-            messages=[],
-            offset=0,
-            sep_style=SeparatorStyle.SINGLE,
-            sep="###",
-        )
+        chat_state.system =  "You are able to understand the visual content that the user provides. Follow the instructions carefully and explain your answers in detail.",
         img_list = []
         llm_message = chat.upload_img(gr_img, chat_state, img_list)
         return gr.update(interactive=False), gr.update(interactive=False), gr.update(interactive=True, placeholder='Type and press Enter'), gr.update(value="Start Chatting", interactive=False), chat_state, img_list,chatbot
     elif gr_video is not None and gr_img is None:
         print(gr_video)
         chatbot = chatbot + [((gr_video,), None)]
-        chat_state = default_conversation.copy()
-        chat_state = Conversation(
-            system= "",
-            roles=("Human", "Assistant"),
-            messages=[],
-            offset=0,
-            sep_style=SeparatorStyle.SINGLE,
-            sep="###",
-        )
+        chat_state.system =  ""
         img_list = []
         if audio_flag:
             llm_message = chat.upload_video(gr_video, chat_state, img_list)
