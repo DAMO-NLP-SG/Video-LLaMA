@@ -8,10 +8,16 @@ model:
   # Q-Former
   num_query_token: 32
 
-  # Vicuna
-  llama_model: "ckpt/vicuna-13b/" or "ckpt/vicuna-7b/"
+  # If you want train models based on LLaMA-2-chat,
+  # some ckpts could be download from our provided huggingface repo
+  # i.e.  https://huggingface.co/DAMO-NLP-SG/Video-LLaMA-2-13B-Pretrained
+  llama_model: "ckpt/vicuna-13b/" or "ckpt/vicuna-7b/" or "ckpt/llama-2-7b-chat-hf"  or "ckpt/llama-2-13b-chat-hf"
   imagebind_ckpt_path: "ckpt/imagebind_path/"
-  # only train audio branch
+  llama_proj_model: 'ckpt/pretrained_minigpt4.pth' or  '/mnt/workspace/ckpt/pretrained_minigpt4_7b.pth'
+  imagebind_ckpt_path: "ckpt/imagebind_path/"
+  
+  # only train vision branch
+  equip_audio_branch: True  # whether equips the audio branch
   frozen_llama_proj: True
   frozen_video_Qformer: True
   frozen_audio_Qformer: False
@@ -20,7 +26,6 @@ model:
   max_frame_pos: 32
   fusion_header_type: "seqTransf"
   num_video_query_token: 32
-
 
 datasets:
   webvid:
@@ -61,7 +66,7 @@ run:
   warmup_lr: 1e-6
 
   weight_decay: 0.05
-  max_epoch: 3
+  max_epoch: 5
   batch_size_train: 32
   batch_size_eval: 32
   num_workers: 8

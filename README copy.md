@@ -154,9 +154,7 @@ Firstly, set the `llama_model`, `imagebind_ckpt_path`, `ckpt` and `ckpt_2` in [e
 Then run the script:
 ```
 python demo_audiovideo.py \
-    --cfg-path eval_configs/video_llama_eval_withaudio.yaml \
-    --model_type llama_v2 \ # or vicuna
-    --gpu-id 0
+    --cfg-path eval_configs/video_llama_eval_withaudio.yaml --model_type vicuna --gpu-id 0
 ```
 
 ## Training

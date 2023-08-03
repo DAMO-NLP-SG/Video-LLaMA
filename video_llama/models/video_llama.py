@@ -65,14 +65,15 @@ class VideoLLAMA(Blip2Base):
         frozen_llama_proj=True,
         frozen_video_Qformer=True,
         frozen_audio_Qformer=True,
-        
+
         llama_proj_model='',
         fusion_header_type= "seqTransf",
         max_frame_pos= 32,
         fusion_head_layers = 2,
         num_video_query_token = 32,
         num_audio_query_token = 8,
-        imagebind_ckpt_path = '/mnt/workspace/ckpt'
+        imagebind_ckpt_path = '/mnt/workspace/ckpt',
+        equip_audio_branch = True
     ):
         super().__init__()
 
@@ -212,56 +213,59 @@ class VideoLLAMA(Blip2Base):
             self.video_query_tokens.requires_grad = True
             logging.info('video_Qformer is not frozen')
 
-        print (f'Initializing audio encoder from {imagebind_ckpt_path} ...')
-        self.audio_encoder,self.audio_hidden_size = \
-            imagebind_model.imagebind_huge()
-        self.audio_encoder.load_state_dict(torch.load("{}/imagebind_huge.pth".format(imagebind_ckpt_path)))
-        # free vision encoder
-        for name, param in self.audio_encoder.named_parameters():
-            param.requires_grad = False
-        self.audio_encoder.eval()
-        print ('audio encoder initialized.')
-        
-        self.num_audio_query_token = num_audio_query_token
-        self.audio_Qformer,self.audio_query_tokens = self.init_video_Qformer(num_query_token = self.num_audio_query_token,\
-            vision_width=self.audio_hidden_size, num_hidden_layers =2)
-        self.audio_Qformer.cls = None
-        self.audio_Qformer.bert.embeddings.word_embeddings = None
-        self.audio_Qformer.bert.embeddings.position_embeddings = None
-        for layer in self.audio_Qformer.bert.encoder.layer:
-            layer.output = None
-            layer.intermediate = None
-        self.audio_llama_proj = nn.Linear(
-            self.audio_Qformer.config.hidden_size, self.llama_model.config.hidden_size
-        )
-        self.audio_position_embedding = nn.Embedding(8, self.audio_hidden_size)
-
         if frozen_video_Qformer and (not frozen_audio_Qformer):
             self.train_flag = 1 # 只训练audio_Qformer
         elif not(frozen_video_Qformer) and frozen_audio_Qformer:
             self.train_flag = 0 # 训练video_Qformer
+        elif not(frozen_video_Qformer) and not(frozen_audio_Qformer):
+            self.train_flag = 2 # video_Qformer and AL trained
         else:
-            self.train_flag = 2 # video_Qformer 
+            self.train_flag = 3
+
+        if equip_audio_branch:
+            print (f'Initializing audio encoder from {imagebind_ckpt_path} ...')
+            self.audio_encoder,self.audio_hidden_size = \
+                imagebind_model.imagebind_huge()
+            self.audio_encoder.load_state_dict(torch.load("{}/imagebind_huge.pth".format(imagebind_ckpt_path)))
+            # free vision encoder
+            for name, param in self.audio_encoder.named_parameters():
+                param.requires_grad = False
+            self.audio_encoder.eval()
+            print ('audio encoder initialized.')
             
-        if frozen_audio_Qformer:
-            #  todo frozen  llama_proj
-            for name, param in self.audio_Qformer.named_parameters():
-                param.requires_grad = False
-            self.audio_query_tokens.requires_grad = False
-            for name, param in self.audio_llama_proj.named_parameters():
-                param.requires_grad = False
-            for name, param in self.audio_position_embedding.named_parameters():
-                param.requires_grad = False
-            logging.info('audio_Qformer and audio-LLAMA proj is frozen')
-        else:
-            for name, param in self.audio_Qformer.named_parameters():
-                param.requires_grad = True
-            self.audio_query_tokens.requires_grad = True
-            for name, param in self.audio_llama_proj.named_parameters():
-                param.requires_grad = True
-            for name, param in self.audio_position_embedding.named_parameters():
-                param.requires_grad = True
-            logging.info('audio_Qformer is not frozen')
+            self.num_audio_query_token = num_audio_query_token
+            self.audio_Qformer,self.audio_query_tokens = self.init_video_Qformer(num_query_token = self.num_audio_query_token,\
+                vision_width=self.audio_hidden_size, num_hidden_layers =2)
+            self.audio_Qformer.cls = None
+            self.audio_Qformer.bert.embeddings.word_embeddings = None
+            self.audio_Qformer.bert.embeddings.position_embeddings = None
+            for layer in self.audio_Qformer.bert.encoder.layer:
+                layer.output = None
+                layer.intermediate = None
+            self.audio_llama_proj = nn.Linear(
+                self.audio_Qformer.config.hidden_size, self.llama_model.config.hidden_size
+            )
+            self.audio_position_embedding = nn.Embedding(8, self.audio_hidden_size)
+
+            if frozen_audio_Qformer:
+                #  todo frozen  llama_proj
+                for name, param in self.audio_Qformer.named_parameters():
+                    param.requires_grad = False
+                self.audio_query_tokens.requires_grad = False
+                for name, param in self.audio_llama_proj.named_parameters():
+                    param.requires_grad = False
+                for name, param in self.audio_position_embedding.named_parameters():
+                    param.requires_grad = False
+                logging.info('audio_Qformer and audio-LLAMA proj is frozen')
+            else:
+                for name, param in self.audio_Qformer.named_parameters():
+                    param.requires_grad = True
+                self.audio_query_tokens.requires_grad = True
+                for name, param in self.audio_llama_proj.named_parameters():
+                    param.requires_grad = True
+                for name, param in self.audio_position_embedding.named_parameters():
+                    param.requires_grad = True
+                logging.info('audio_Qformer is not frozen')
 
 
         #  self.audio_hidden_size
@@ -557,11 +561,13 @@ class VideoLLAMA(Blip2Base):
         frozen_audio_Qformer = cfg.get("frozen_audio_Qformer", True)
 
         llama_proj_model = cfg.get("llama_proj_model", '')
-
+        
         fusion_header_type = cfg.get("fusion_header_type", 'seqTransf')
         max_frame_pos = cfg.get("max_frame_pos", 32)
         fusion_head_layers = cfg.get("fusion_head_layers", 2)
         num_video_query_token =  cfg.get("num_video_query_token", 32)
+
+        equip_audio_branch= cfg.get("equip_audio_branch", True)
         num_audio_query_token =  cfg.get("num_audio_query_token", 8)
         imagebind_ckpt_path = cfg.get("imagebind_ckpt_path", '/mnt/workspace/ckpt')
         model = cls(
@@ -590,6 +596,7 @@ class VideoLLAMA(Blip2Base):
             num_video_query_token=num_video_query_token,
             num_audio_query_token = num_audio_query_token,
             imagebind_ckpt_path = imagebind_ckpt_path,
+            equip_audio_branch = equip_audio_branch
         )
 
         ckpt_path = cfg.get("ckpt", "")  # load weights of MiniGPT-4
