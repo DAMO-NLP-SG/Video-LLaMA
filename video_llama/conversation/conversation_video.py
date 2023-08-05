@@ -6,7 +6,6 @@ import argparse
 import time
 from PIL import Image
 import sys
-sys.path.append('/mnt/workspace/videoGPT/Video-llama/')
 import os
 import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM, LlamaTokenizer
@@ -222,8 +221,12 @@ class Chat:
         if output_token[0] == 1:  # some users find that there is a start token <s> at the beginning. remove it
             output_token = output_token[1:]
         output_text = self.model.llama_tokenizer.decode(output_token, add_special_tokens=False)
-        output_text = output_text.split(conv.sep2)[0]  # remove the stop sign '###'
-        output_text = output_text.split(conv.roles[1]+':')[-1].strip()
+        if conv.sep =="###":
+            output_text = output_text.split('###')[0]  # remove the stop sign '###'
+            output_text = output_text.split('Assistant:')[-1].strip()
+        else:
+            output_text = output_text.split(conv.sep2)[0]  # remove the stop sign '###'
+            output_text = output_text.split(conv.roles[1]+':')[-1].strip()
         conv.messages[-1][1] = output_text
         return output_text, output_token.cpu().numpy()
     

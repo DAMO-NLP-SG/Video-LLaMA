@@ -25,6 +25,7 @@ class VideoLLAMA(Blip2Base):
 
     PRETRAINED_MODEL_CONFIG_DICT = {
         "pretrain_vicuna": "configs/models/video_llama.yaml",
+        "pretrain_llama_v2": "configs/models/video_llama.yaml",
     }
 
     @classmethod
