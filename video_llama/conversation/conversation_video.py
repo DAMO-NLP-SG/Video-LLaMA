@@ -262,8 +262,8 @@ class Chat:
                 # image_emb, _ = self.model.encode_videoQformer_audiovideo(video,audio)
                 image_emb, _ = self.model.encode_videoQformer_visual(video)
                 audio_emb,_  = self.model.encode_audioQformer(audio)
-                img_list.append(image_emb)
                 img_list.append(audio_emb)
+                img_list.append(image_emb)
                 conv.system = ""
                 # conv.append_message(conv.roles[0], "The audio of this video is <Video><ImageHere></Video> ")
                 conv.append_message(conv.roles[0], "Close your eyes, open your ears and you imagine only based on the sound that: <ImageHere>. \
