@@ -231,7 +231,7 @@ def _tokenize_fn(strings: Sequence[str],
         labels_lens=labels_lens,
     )
 
-def preprocess_for_llama_v2(
+def preprocess(
     sources: Sequence[str],
     tokenizer: transformers.PreTrainedTokenizer,
 ) -> Dict:
@@ -260,7 +260,7 @@ def preprocess_for_llama_v2(
 
     return dict(input_ids=input_ids, labels=targets)
 
-def preprocess(
+def preprocess_for_llama_v2(
     sources: Sequence[str],
     tokenizer: transformers.PreTrainedTokenizer,
 ) -> Dict:
