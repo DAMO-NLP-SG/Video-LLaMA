@@ -156,7 +156,7 @@ class VideoLLAMA(Blip2Base):
         if llama_proj_model:
             print("load llama proj weight: {}".format(llama_proj_model))
             llama_proj_weight = torch.load(llama_proj_model, map_location="cpu")
-            msg = model.load_state_dict(llama_proj_weight['model'], strict=False)
+            msg = self.load_state_dict(llama_proj_weight['model'], strict=False)
 
         if frozen_llama_proj:
             #  todo frozen  llama_proj
@@ -597,7 +597,8 @@ class VideoLLAMA(Blip2Base):
             num_video_query_token=num_video_query_token,
             num_audio_query_token = num_audio_query_token,
             imagebind_ckpt_path = imagebind_ckpt_path,
-            equip_audio_branch = equip_audio_branch
+            equip_audio_branch = equip_audio_branch,
+            llama_proj_model = llama_proj_model
         )
 
         ckpt_path = cfg.get("ckpt", "")  # load weights of MiniGPT-4
