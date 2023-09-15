@@ -16,7 +16,6 @@ model:
   ckpt: 'path/pretrained_visual_branch_ckpt'   # you can use our pretrained ckpt from https://huggingface.co/DAMO-NLP-SG/Video-LLaMA-2-13B-Pretrained/
   equip_audio_branch: False
 
-  equip_audio_branch: True  # whether equips the audio branch
   fusion_head_layers: 2
   max_frame_pos: 32
   fusion_header_type: "seqTransf"
