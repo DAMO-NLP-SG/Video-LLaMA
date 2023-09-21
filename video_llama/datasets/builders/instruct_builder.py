@@ -44,6 +44,8 @@ class Instruct_Builder(BaseDatasetBuilder):
             vis_root=build_info.videos_dir,
             ann_root=build_info.anno_dir,
             num_video_query_token = num_video_query_token,
+            resize_size=self.config.vis_processor.train.image_size,
+            num_frm=self.config.vis_processor.train.n_frms,
             tokenizer_name = tokenizer_name,
             data_type = self.config.data_type
         )
