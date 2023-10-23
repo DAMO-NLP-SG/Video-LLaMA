@@ -273,7 +273,7 @@ def preprocess_for_llama_v2(
     """
     # add end signal and concatenate together
     conversations = []
-    conv = copy.deepcopy(video_conversation.copy())
+    conv = copy.deepcopy(llama_v2_video_conversation.copy())
     roles = {"human": conv.roles[0], "gpt": conv.roles[1]}
     for source in sources:
         # <s>[INST] <<SYS>>\n{system_prompt}\n<</SYS>>\n\n
