@@ -18,6 +18,7 @@ This is the repo for the Video-LLaMA project, which is working on empowering lar
 </div>
 
 ## News
+- [11.14] ⭐️ The current README file is for **Video-LLaMA-2** (LLaMA-2-Chat as language decoder) only, instructions for using the previous version of Video-LLaMA (Vicuna as language decoder) can be found at [here](https://github.com/DAMO-NLP-SG/Video-LLaMA/blob/main/README_Vicuna.md).
 - [08.03] 🚀🚀 Release **Video-LLaMA-2** with [Llama-2-7B/13B-Chat](https://huggingface.co/meta-llama) as language decoder
     - **NO** delta weights and separate Q-former weights anymore, full weights to run Video-LLaMA are all here :point_right: [[7B](https://huggingface.co/DAMO-NLP-SG/Video-LLaMA-2-7B-Finetuned)][[13B](https://huggingface.co/DAMO-NLP-SG/Video-LLaMA-2-13B-Finetuned)] 
     - Allow further customization starting from our pre-trained checkpoints [[7B-Pretrained](https://huggingface.co/DAMO-NLP-SG/Video-LLaMA-2-7B-Pretrained)] [[13B-Pretrained](https://huggingface.co/DAMO-NLP-SG/Video-LLaMA-2-13B-Pretrained)]
@@ -80,29 +81,20 @@ This is the repo for the Video-LLaMA project, which is working on empowering lar
 
 ## Pre-trained & Fine-tuned Checkpoints
 
-The following checkpoints store learnable parameters (positional embedding layers, Video/Audio Q-former, and linear projection layers) only.
+~~The following checkpoints store learnable parameters (positional embedding layers, Video/Audio Q-former, and linear projection layers) only.~~
 
-#### Vision-Language Branch
-| Checkpoint       | Link | Note |
-|:------------|-------------|-------------|
-| pretrain-vicuna7b    | [link](https://huggingface.co/DAMO-NLP-SG/Video-LLaMA-Series/resolve/main/pretrain_vicuna7b-v2.pth)       | Pre-trained on WebVid (2.5M video-caption pairs) and LLaVA-CC3M (595k image-caption pairs) |
-| finetune-vicuna7b-v2 | [link](https://huggingface.co/DAMO-NLP-SG/Video-LLaMA-Series/resolve/main/finetune-vicuna7b-v2.pth) | Fine-tuned on the instruction-tuning data from [MiniGPT-4](https://github.com/Vision-CAIR/MiniGPT-4), [LLaVA](https://github.com/haotian-liu/LLaVA) and [VideoChat](https://github.com/OpenGVLab/Ask-Anything)|
-| pretrain-vicuna13b    | [link](https://huggingface.co/DAMO-NLP-SG/Video-LLaMA-Series/resolve/main/pretrain-vicuna13b.pth)       | Pre-trained on WebVid (2.5M video-caption pairs) and LLaVA-CC3M (595k image-caption pairs) |
-| finetune-vicuna13b-v2 | [link](https://huggingface.co/DAMO-NLP-SG/Video-LLaMA-Series/resolve/main/finetune-vicuna13b-v2.pth) | Fine-tuned on the instruction-tuning data from [MiniGPT-4](https://github.com/Vision-CAIR/MiniGPT-4), [LLaVA](https://github.com/haotian-liu/LLaVA) and [VideoChat](https://github.com/OpenGVLab/Ask-Anything)|
-| pretrain-ziya13b-zh | [link](https://huggingface.co/DAMO-NLP-SG/Video-LLaMA-Series/resolve/main/pretrain-ziya13b-zh.pth) | Pre-trained with Chinese LLM [Ziya-13B](https://huggingface.co/IDEA-CCNL/Ziya-LLaMA-13B-v1) |
-| finetune-ziya13b-zh | [link](https://huggingface.co/DAMO-NLP-SG/Video-LLaMA-Series/resolve/main/finetune-ziya13b-zh.pth) | Fine-tuned on machine-translated [VideoChat](https://github.com/OpenGVLab/Ask-Anything) instruction-following dataset (in Chinese)|
-| pretrain-billa7b-zh | [link](https://huggingface.co/DAMO-NLP-SG/Video-LLaMA-Series/resolve/main/pretrain-billa7b-zh.pth) | Pre-trained with Chinese LLM [BiLLA-7B-SFT](https://huggingface.co/Neutralzz/BiLLa-7B-SFT) |
-| finetune-billa7b-zh | [link](https://huggingface.co/DAMO-NLP-SG/Video-LLaMA-Series/resolve/main/finetune-billa7b-zh.pth) | Fine-tuned on machine-translated [VideoChat](https://github.com/OpenGVLab/Ask-Anything) instruction-following dataset (in Chinese) |
+The following checkpoints are the full weights (visual encoder + audio encoder + Q-Formers + language decoder) to launch Video-LLaMA:
 
-#### Audio-Language Branch
 | Checkpoint       | Link | Note |
-|:------------|-------------|-------------|
-| pretrain-vicuna7b    | [link](https://huggingface.co/DAMO-NLP-SG/Video-LLaMA-Series/resolve/main/pretrain_vicuna7b_audiobranch.pth)       | Pre-trained on WebVid (2.5M video-caption pairs) and LLaVA-CC3M (595k image-caption pairs) |
-| finetune-vicuna7b-v2 | [link](https://huggingface.co/DAMO-NLP-SG/Video-LLaMA-Series/resolve/main/finetune_vicuna7b_audiobranch.pth) | Fine-tuned on the instruction-tuning data from [MiniGPT-4](https://github.com/Vision-CAIR/MiniGPT-4), [LLaVA](https://github.com/haotian-liu/LLaVA) and [VideoChat](https://github.com/OpenGVLab/Ask-Anything)|
+|:------------------|-------------|-------------|
+| Video-LLaMA-2-7B-Pretrained    | [link](https://huggingface.co/DAMO-NLP-SG/Video-LLaMA-2-13B-Finetuned/tree/main)       | Pre-trained on WebVid (2.5M video-caption pairs) and LLaVA-CC3M (595k image-caption pairs) |
+| Video-LLaMA-2-7B-Finetuned | [link](https://huggingface.co/DAMO-NLP-SG/Video-LLaMA-2-7B-Finetuned/tree/main) | Fine-tuned on the instruction-tuning data from [MiniGPT-4](https://github.com/Vision-CAIR/MiniGPT-4), [LLaVA](https://github.com/haotian-liu/LLaVA) and [VideoChat](https://github.com/OpenGVLab/Ask-Anything)|
+| Video-LLaMA-2-13B-Pretrained    | [link](https://huggingface.co/DAMO-NLP-SG/Video-LLaMA-2-13B-Pretrained/tree/main)       | Pre-trained on WebVid (2.5M video-caption pairs) and LLaVA-CC3M (595k image-caption pairs) |
+| Video-LLaMA-2-13B-Finetuned | [link](https://huggingface.co/DAMO-NLP-SG/Video-LLaMA-2-13B-Finetuned/tree/main) | Fine-tuned on the instruction-tuning data from [MiniGPT-4](https://github.com/Vision-CAIR/MiniGPT-4), [LLaVA](https://github.com/haotian-liu/LLaVA) and [VideoChat](https://github.com/OpenGVLab/Ask-Anything)|
 
 
 ## Usage
-#### Enviroment Preparation 
+#### Environment Preparation 
 
 First, install ffmpeg.
 ```
@@ -118,42 +110,13 @@ conda activate videollama
 
 ## Prerequisites
 
-Before using the repository, make sure you have obtained the following checkpoints:
+~~Before using the repository, make sure you have obtained the following checkpoints:~~
 
-#### Pre-trained Language Decoder
-
-- Get the original LLaMA weights in the Hugging Face format by following the instructions [here](https://huggingface.co/docs/transformers/main/model_doc/llama).
-- Download Vicuna delta weights :point_right: [[7B](https://huggingface.co/lmsys/vicuna-7b-delta-v0)][[13B](https://huggingface.co/lmsys/vicuna-13b-delta-v0)] (Note: we use **v0 weights** instead of v1.1 weights). 
-- Use the following command to add delta weights to the original LLaMA weights to obtain the Vicuna weights:
-
-```
-python apply_delta.py \
-    --base /path/to/llama-13b \
-    --target /output/path/to/vicuna-13b --delta /path/to/vicuna-13b-delta
-```
-
-#### Pre-trained Visual Encoder in Vision-Language Branch
-- Download the MiniGPT-4 model (trained linear layer) from this [link](https://drive.google.com/file/d/1a4zLvaiDBr-36pasffmgpvH5P7CKmpze/view).
-
-#### Pre-trained Audio Encoder in Audio-Language Branch
-- Download the weight of ImageBind from this [link](https://github.com/facebookresearch/ImageBind). 
-
-## Download Learnable Weights
-Use `git-lfs` to download the learnable weights of our Video-LLaMA (i.e., positional embedding layer + Q-Former + linear projection layer):
-```bash
-git lfs install
-git clone https://huggingface.co/DAMO-NLP-SG/Video-LLaMA-Series
-```
-The above commands will download the model weights of all the Video-LLaMA variants. For sure, you can choose to download the weights on demand. For example, if you want to run Video-LLaMA with Vicuna-7B as language decoder locally, then:
-```bash
-wget https://huggingface.co/DAMO-NLP-SG/Video-LLaMA-Series/resolve/main/finetune-vicuna7b-v2.pth
-wget https://huggingface.co/DAMO-NLP-SG/Video-LLaMA-Series/resolve/main/finetune_vicuna7b_audiobranch.pth
-```
-should meet the requirement.
+DON'T have to do anything now!!
 
 ## How to Run Demo Locally
 
-Firstly, set the `llama_model`, `imagebind_ckpt_path`, `ckpt` and `ckpt_2` in [eval_configs/video_llama_eval_withaudio.yaml](./eval_configs/video_llama_eval_withaudio.yaml).
+Firstly, set the `llama_model` (for the path to the language decoder), `imagebind_ckpt_path` (for the path to the audio encoder), `ckpt` (for the path to VL branch) and `ckpt_2` (for the path to AL branch) in [eval_configs/video_llama_eval_withaudio.yaml](./eval_configs/video_llama_eval_withaudio.yaml) accordingly.
 Then run the script:
 ```
 python demo_audiovideo.py \
@@ -190,11 +153,14 @@ The folder structure of the dataset is shown below:
 |────...
 ```
 #### Script
-Config the the checkpoint and dataset paths in [video_llama_stage1_pretrain.yaml](./train_configs/video_llama_stage1_pretrain.yaml).
-Run the script:
+Config the checkpoint and dataset paths in [visionbranch_stage1_pretrain.yaml](./train_configs/visionbranch_stage1_pretrain.yaml) and [audiobranch_stage1_pretrain.yaml](audiobranch_stage1_pretrain.yaml) respectively. Then, run the script:
 ```
 conda activate videollama
-torchrun --nproc_per_node=8 train.py --cfg-path  ./train_configs/video_llama_stage1_pretrain.yaml
+# for pre-training VL branch
+torchrun --nproc_per_node=8 train.py --cfg-path  ./train_configs/audiobranch_stage1_pretrain.yaml
+
+# for pre-training AL branch
+torchrun --nproc_per_node=8 train.py --cfg-path  ./train_configs/audiobranch_stage1_pretrain.yaml
 ```
 
 ### 2. Instruction Fine-tuning
@@ -205,10 +171,14 @@ For now, the fine-tuning dataset consists of:
 * 11K video-based instructions from VideoChat [[link](https://github.com/OpenGVLab/InternVideo/tree/main/Data/instruction_data)]
 
 #### Script
-Config the checkpoint and dataset paths in [video_llama_stage2_finetune.yaml](./train_configs/video_llama_stage2_finetune.yaml).
+Config the checkpoint and dataset paths in [visionbranch_stage2_pretrain.yaml](./train_configs/visionbranch_stage2_pretrain.yaml) and [audiobranch_stage2_pretrain.yaml](audiobranch_stage2_pretrain.yaml) respectively. Then, run the following script:
 ```
 conda activate videollama
-torchrun --nproc_per_node=8 train.py --cfg-path  ./train_configs/video_llama_stage2_finetune.yaml
+# for fine-tuning VL branch
+torchrun --nproc_per_node=8 train.py --cfg-path  ./train_configs/visionbranch_stage2_finetune.yaml
+
+# for fine-tuning AL branch
+torchrun --nproc_per_node=8 train.py --cfg-path  ./train_configs/audiobranch_stage2_finetune.yaml
 ```
 
 ## Recommended GPUs
