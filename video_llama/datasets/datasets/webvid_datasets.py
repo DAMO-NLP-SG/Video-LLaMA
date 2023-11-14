@@ -40,7 +40,7 @@ class WebvidDataset(BaseDataset):
         self.frm_sampling_strategy = 'headtail'
 
     def _get_video_path(self, sample):
-        rel_video_fp = os.path.join(sample['page_dir'], str(sample['videoid']) + '.mp4')
+        rel_video_fp = os.path.join(str(sample['page_dir']), str(sample['videoid']) + '.mp4')
         full_video_fp = os.path.join(self.vis_root,  rel_video_fp)
         return full_video_fp
 
