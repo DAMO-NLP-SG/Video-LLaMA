@@ -40,7 +40,7 @@ llama_v2_video_conversation = Conversation(
 IGNORE_INDEX = -100
 
 class Video_Instruct_Dataset(BaseDataset):
-    def __init__(self, vis_processor, text_processor, vis_root, ann_root,num_video_query_token=32,tokenizer_name = '/mnt/workspace/ckpt/vicuna-13b/',data_type = 'video', model_type='vicuna'):
+    def __init__(self, vis_processor, text_processor, vis_root, ann_root, num_video_query_token=32, resize_size=224, num_frm=8, tokenizer_name = '/mnt/workspace/ckpt/vicuna-13b/',data_type = 'video', model_type='vicuna'):
         """
         vis_root (string): Root directory of Llava images (e.g. webvid_eval/video/)
         ann_root (string): Root directory of video (e.g. webvid_eval/annotations/)
@@ -54,8 +54,8 @@ class Video_Instruct_Dataset(BaseDataset):
 
         self.num_video_query_token = num_video_query_token
         self.vis_root = vis_root
-        self.resize_size = 224
-        self.num_frm = 8
+        self.resize_size = resize_size
+        self.num_frm = num_frm
         self.tokenizer = LlamaTokenizer.from_pretrained(tokenizer_name, use_fast=False)
         self.tokenizer.pad_token = self.tokenizer.unk_token
         self.tokenizer.add_tokens([DEFAULT_IMAGE_PATCH_TOKEN], special_tokens=True)

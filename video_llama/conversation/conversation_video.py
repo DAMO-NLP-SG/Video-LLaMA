@@ -166,11 +166,13 @@ conv_llava_llama_2 = Conversation(
     sep2="</s>",
 )
 class Chat:
-    def __init__(self, model, vis_processor, device='cuda:0'):
+    def __init__(self, model, vis_processor, device='cuda:0', vis_processor_cfg):
         self.device = device
         self.model = model
         self.vis_processor = vis_processor
         self.image_vis_processor = Blip2ImageEvalProcessor()
+        self.n_frms = vis_processor_cfg.n_frms
+        self.image_size = vis_processor_cfg.image_size
         # stop_words_ids = [torch.tensor([835]).to(self.device),
         #                   torch.tensor([2277, 29937]).to(self.device)]  # '###' can be encoded in two different ways.
         # self.stopping_criteria = StoppingCriteriaList([StoppingCriteriaSub(stops=stop_words_ids)])
@@ -230,7 +232,7 @@ class Chat:
         conv.messages[-1][1] = output_text
         return output_text, output_token.cpu().numpy()
     
-    def upload_video(self, video_path, conv, img_list):
+    def upload_video(self, video_path, conv, img_list, n_frms=8, image_size=224):
 
         msg = ""
         if isinstance(video_path, str):  # is a video path
@@ -239,9 +241,9 @@ class Chat:
             # image = self.vis_processor(image).unsqueeze(0).to(self.device)
             video, msg = load_video(
                 video_path=video_path,
-                n_frms=8,
-                height=224,
-                width=224,
+                n_frms=self.n_frms,
+                height=self.image_size,
+                width=self.image_size,
                 sampling ="uniform", return_msg = True
             )
             video = self.vis_processor.transform(video)
@@ -277,7 +279,7 @@ class Chat:
                 conv.append_message(conv.roles[0], "<Video><ImageHere></Video> "+ msg)
             return "Received."
 
-    def upload_video_without_audio(self, video_path, conv, img_list):
+    def upload_video_without_audio(self, video_path, conv, img_list, n_frms=8, image_size=224):
         msg = ""
         if isinstance(video_path, str):  # is a video path
             ext = os.path.splitext(video_path)[-1].lower()
@@ -285,9 +287,9 @@ class Chat:
             # image = self.vis_processor(image).unsqueeze(0).to(self.device)
             video, msg = load_video(
                 video_path=video_path,
-                n_frms=8,
-                height=224,
-                width=224,
+                n_frms=self.n_frms,
+                height=self.image_size,
+                width=self.image_size,
                 sampling ="uniform", return_msg = True
             )
             video = self.vis_processor.transform(video)
