@@ -1,0 +1,19 @@
+version: '3'
+services:
+  videollama:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: videollama:latest
+    volumes:
+      - .:/app
+    working_dir: /app
+    runtime: nvidia
+    deploy:
+      resources:
+        limits:
+          cpus: '4'
+          memory: '16g'
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+
