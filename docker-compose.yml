@@ -5,6 +5,8 @@ services:
       context: .
       dockerfile: Dockerfile
     image: videollama:latest
+    ports:
+      - "7860:7860"
     volumes:
       - .:/app
     working_dir: /app

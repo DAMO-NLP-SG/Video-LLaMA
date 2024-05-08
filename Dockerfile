@@ -8,6 +8,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ffmpeg \
     git \
+    curl \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -38,6 +39,9 @@ RUN git clone https://huggingface.co/DAMO-NLP-SG/Video-LLaMA-2-13B-Finetuned \
 # Copy the project files into the container
 COPY . /app
 
-# Default command
-CMD ["bash"]
+# Set the default working directory
+WORKDIR /app
+
+# Command to run the demo with Gradio
+CMD ["python", "demo_video.py", "--cfg-path", "eval_configs/video_llama_eval_only_vl.yaml", "--model_type", "llama_v2"]
 
