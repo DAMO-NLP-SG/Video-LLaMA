@@ -4,16 +4,20 @@ FROM pytorch/pytorch:1.12.1-cuda11.3-cudnn8-runtime
 # Set environment variables
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install system dependencies (ffmpeg and git-lfs)
+# Install system dependencies (ffmpeg, git, curl, gnupg, build tools)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ffmpeg \
     git \
     curl \
+    gnupg \
+    build-essential \
+    python3-dev \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
 # Install git-lfs
 RUN curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash \
+    && apt-get update \
     && apt-get install -y git-lfs \
     && git lfs install
 
@@ -31,10 +35,9 @@ RUN conda install -c pytorch -c defaults -c anaconda \
 # Install pip dependencies
 RUN pip install --no-cache-dir -r /app/requirement.txt
 
-# Clone the required repositories with git-lfs
+# Clone the pretrained repository only
 WORKDIR /app
-RUN git clone https://huggingface.co/DAMO-NLP-SG/Video-LLaMA-2-13B-Finetuned \
-    && git clone https://huggingface.co/DAMO-NLP-SG/Video-LLaMA-2-13B-Pretrained
+RUN git clone https://huggingface.co/DAMO-NLP-SG/Video-LLaMA-2-13B-Pretrained
 
 # Copy the project files into the container
 COPY . /app
