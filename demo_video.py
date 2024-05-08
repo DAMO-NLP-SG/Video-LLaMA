@@ -73,7 +73,6 @@ model.eval()
 vis_processor_cfg = cfg.datasets_cfg.webvid.vis_processor.train
 vis_processor = registry.get_processor_class(vis_processor_cfg.name).from_config(vis_processor_cfg)
 chat = Chat(model, vis_processor, device=device)
-
 print('Initialization Finished')
 
 # ========================================
