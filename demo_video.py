@@ -57,12 +57,8 @@ cfg = Config(args)
 model_config = cfg.model_cfg
 
 # Determine if a GPU is available; default to CPU otherwise
-if torch.cuda.is_available():
-    device = torch.device(f'cuda:{args.gpu_id}')
-    print(f"Using GPU: {args.gpu_id}")
-else:
-    device = torch.device('cpu')
-    print("No GPU available, using CPU instead")
+device = torch.device('cpu')
+print("No GPU available, using CPU instead")
 
 # Initialize the model on the appropriate device
 model_cls = registry.get_model_class(model_config.arch)
