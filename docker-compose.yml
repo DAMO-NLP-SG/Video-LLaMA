@@ -1,4 +1,4 @@
-version: '3'
+version: '3.9'
 services:
   videollama:
     build:
@@ -10,6 +10,8 @@ services:
     volumes:
       - .:/app
     working_dir: /app
+    environment:
+      - HUGGING_FACE_HUB_TOKEN=${HUGGING_FACE_HUB_TOKEN}
     deploy:
       resources:
         limits:

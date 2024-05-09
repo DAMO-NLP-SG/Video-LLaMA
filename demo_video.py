@@ -232,5 +232,5 @@ with gr.Blocks() as demo:
     )
     clear.click(gradio_reset, [chat_state, img_list], [chatbot, video, image, text_input, upload_button, chat_state, img_list], queue=False)
     
-demo.launch(share=False, enable_queue=True)
+demo.launch(share=True, enable_queue=True)
 
