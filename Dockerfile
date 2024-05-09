@@ -35,9 +35,8 @@ RUN conda install -c pytorch -c defaults -c anaconda \
 # Install pip dependencies
 RUN pip install --no-cache-dir -r /app/requirement.txt
 
-# Clone the pretrained repository only
-WORKDIR /app
-RUN git clone https://huggingface.co/DAMO-NLP-SG/Video-LLaMA-2-13B-Pretrained
+# Copy the pre-downloaded pretrained repository
+COPY Video-LLaMA-2-13B-Pretrained /app/Video-LLaMA-2-13B-Pretrained
 
 # Copy the project files into the container
 COPY . /app
