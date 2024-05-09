@@ -58,7 +58,6 @@ model_config = cfg.model_cfg
 
 # Determine if a GPU is available; default to CPU otherwise
 device = torch.device('cpu')
-print("No GPU available, using CPU instead")
 
 # Initialize the model on the appropriate device
 model_cls = registry.get_model_class(model_config.arch)
@@ -128,46 +127,12 @@ def gradio_answer(chatbot, chat_state, img_list, num_beams, temperature):
     return chatbot, chat_state, img_list
 
 title = """
-<h1 align="center"><a href="https://github.com/DAMO-NLP-SG/Video-LLaMA"><img src="https://s1.ax1x.com/2023/05/22/p9oQ0FP.jpg", alt="Video-LLaMA" border="0" style="margin: 0 auto; height: 200px;" /></a> </h1>
-
 <h1 align="center">Video-LLaMA: An Instruction-tuned Audio-Visual Language Model for Video Understanding</h1>
-
-<h5 align="center">Introduction: Video-LLaMA is a multi-model large language model that achieves video-grounded conversations between humans and computers by connecting language decoder with off-the-shelf unimodal pre-trained models. </h5> 
-
-<div style='display:flex; gap: 0.25rem; '>
-<a href='https://github.com/DAMO-NLP-SG/Video-LLaMA'><img src='https://img.shields.io/badge/Github-Code-success'></a>
-<a href='https://huggingface.co/spaces/DAMO-NLP-SG/Video-LLaMA'><img src='https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-blue'></a> 
-<a href='https://huggingface.co/DAMO-NLP-SG/Video-LLaMA-Series'><img src='https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Model-blue'></a> 
-<a href='https://modelscope.cn/studios/damo/video-llama/summary'><img src='https://img.shields.io/badge/ModelScope-Demo-blueviolet'></a> 
-<a href='https://arxiv.org/abs/2306.02858'><img src='https://img.shields.io/badge/Paper-PDF-red'></a>
-</div>
-
-Thank you for using the Video-LLaMA Demo Page! If you have any questions or feedback, feel free to contact us.
-
-If you find Video-LLaMA interesting, please give us a star on GitHub.
-
-Current online demo uses the 7B version of Video-LLaMA due to resource limitations. We have released the 13B version on our GitHub repository.
 """
 
-Note_markdown = """
-### Note
-Video-LLaMA is a prototype model and may have limitations in understanding complex scenes, long videos, or specific domains.
-The output results may be influenced by input quality, limitations of the dataset, and the model's susceptibility to illusions. Please interpret the results with caution.
+Note_markdown = """ """
 
-**Copyright 2023 Alibaba DAMO Academy.**
-"""
-
-cite_markdown = """
-## Citation
-If you find our project useful, hope you can star our repo and cite our paper as follows:
-@article{damonlpsg2023videollama,
-author = {Zhang, Hang and Li, Xin and Bing, Lidong},
-title = {Video-LLaMA: An Instruction-tuned Audio-Visual Language Model for Video Understanding},
-year = 2023,
-journal = {arXiv preprint arXiv:2306.02858},
-url = {https://arxiv.org/abs/2306.02858}
-}
-"""
+cite_markdown = """ """
 
 case_note_upload = """
 ### We provide some examples at the bottom of the page. Simply click on them to try them out directly.
