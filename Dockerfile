@@ -42,6 +42,9 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     && pip install -r requirement.txt \
     && pip install torch==1.12.1+cu113 torchvision==0.13.1+cu113 torchaudio==0.12.1+cu113 -f https://download.pytorch.org/whl/torch_stable.html 
 
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install gunicorn==21.2.0
+ 
 # Stage 2: Final Application Image
 FROM base AS final
 
