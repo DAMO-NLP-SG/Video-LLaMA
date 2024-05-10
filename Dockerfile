@@ -12,6 +12,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     wget \
     build-essential \
     python3-dev \
+    vim \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Miniconda
@@ -44,6 +45,11 @@ RUN --mount=type=cache,target=/root/.cache/pip \
 
 RUN --mount=type=cache,target=/root/.cache/pip \
     pip install gunicorn==21.2.0
+
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install werkzeug
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install flask
  
 # Stage 2: Final Application Image
 FROM base AS final
@@ -58,7 +64,12 @@ ENV HUGGING_FACE_HUB_TOKEN=$HUGGING_FACE_HUB_TOKEN
 # Expose Flask default port
 EXPOSE 5000
 
-# Entry point command, include the parameters here
-CMD ["python", "app.py", "--cfg-path", "eval_configs/video_llama_eval_only_vl.yaml", "--model_type", "llama_v2"]
+# The command to run the application
+CMD ["gunicorn", \
+      "--workers", "1", \
+      "--bind", "0.0.0.0:5000", \
+      "wsgi:app", \
+      "--reload"]
+
 
 

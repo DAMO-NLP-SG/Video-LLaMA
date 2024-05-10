@@ -35,4 +35,5 @@ datasets:
         name: "blip_caption"
 
 run:
+  seed: 42
   task: video_text_pretrain
