@@ -7,6 +7,7 @@ from video_llama.common.dist_utils import get_rank
 from video_llama.common.registry import registry
 from video_llama.conversation.conversation_video import Chat, default_conversation, conv_llava_llama_2
 import gradio as gr
+from flask import current_app
 
 def setup_seeds(seed):
     """Set up random seeds for reproducibility."""
@@ -17,26 +18,37 @@ def setup_seeds(seed):
     cudnn.benchmark = False
     cudnn.deterministic = True
 
-def initialize_chat_model_factory(config_path, model_type='llama_v2', device_type='cpu'):
-    """
-    Factory to initialize and return a Chat instance.
 
-    Parameters:
-        config_path (str): Path to the configuration file.
-        model_type (str): Model type string used to look up the model class. Default is 'llama_v2'.
-        device_type (str): Device string for PyTorch device. Default is 'cpu'.
+def initialize_chat_model_factory():
+    """
+    Factory to initialize and return a Chat instance using the current app config.
 
     Returns:
         Chat: An initialized Chat instance with the appropriate model and processors.
     """
-    # Load configuration
-    config = Config(config_path)
+    # Access configuration settings directly from the Flask app config
+    cfg_path = current_app.config['CONFIG_PATH']
+    options = current_app.config['OPTIONS']
+    model_type = current_app.config['MODEL_TYPE']
+    device_type = current_app.config['DEVICE_TYPE']
+
+    # Create a mock arguments class to satisfy the `Config` class
+    class MockArgs:
+        def __init__(self, cfg_path, options):
+            self.cfg_path = cfg_path
+            self.options = [f"{k}={v}" for k, v in options.items()]
+
+    mock_args = MockArgs(cfg_path, options)
+
+    # Initialize the Config object with the mock arguments
+    config = Config(mock_args)
+    model_config = config.model_cfg
     setup_seeds(config.run_cfg.seed)
 
     # Initialize the model based on the specified type
     device = torch.device(device_type)
-    model_cls = registry.get_model_class(model_type)
-    model = model_cls.from_config(config).to(device)
+    model_cls = registry.get_model_class(model_config.arch)
+    model = model_cls.from_config(model_config).to(device)
     model.eval()
 
     # Set up the visual processor
