@@ -66,10 +66,12 @@ EXPOSE 5000
 
 # The command to run the application
 CMD ["gunicorn", \
-      "--workers", "1", \
-      "--bind", "0.0.0.0:5000", \
-      "wsgi:app", \
-      "--reload"]
-
-
+     "--workers", "4", \  
+     "--timeout", "240", \  
+     "--bind", "0.0.0.0:5000", \
+     "--log-level", "debug", \ 
+     "--access-logfile", "-", \
+     "--error-logfile", "-", \
+     "wsgi:app", \
+     "--reload"]
 
