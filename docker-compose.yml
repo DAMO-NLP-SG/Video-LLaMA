@@ -1,0 +1,20 @@
+version: '3.9'
+services:
+  videollama:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: videollama:latest
+    ports:
+      - "5000:5000"
+    volumes:
+      - .:/app
+    working_dir: /app
+    environment:
+      - HUGGING_FACE_HUB_TOKEN=${HUGGING_FACE_HUB_TOKEN}
+    deploy:
+      resources:
+        limits:
+          cpus: '4'
+          memory: '16g'
+

@@ -119,7 +119,7 @@ class VideoLLAMA(Blip2Base):
         logging.info('Loading Q-Former Done')
 
         logging.info('Loading LLAMA Tokenizer')
-        self.llama_tokenizer = LlamaTokenizer.from_pretrained(llama_model, use_fast=False)
+        self.llama_tokenizer = LlamaTokenizer.from_pretrained(llama_model, use_auth_token=True, use_fast=False)
         if self.llama_tokenizer.pad_token is None:
             self.llama_tokenizer.pad_token = self.llama_tokenizer.unk_token 
         DEFAULT_IMAGE_PATCH_TOKEN = '<ImageHere>'
@@ -135,6 +135,7 @@ class VideoLLAMA(Blip2Base):
             self.llama_model = LlamaForCausalLM.from_pretrained(
                 llama_model,
                 torch_dtype=torch.bfloat16,
+                use_auth_token=True,
                 load_in_8bit=True,
                 device_map={'': device_8bit}
             )
@@ -601,7 +602,10 @@ class VideoLLAMA(Blip2Base):
             llama_proj_model = llama_proj_model
         )
 
+
         ckpt_path = cfg.get("ckpt", "")  # load weights of MiniGPT-4
+        print(f"Loading checkpoint from: {ckpt_path}")
+
         if ckpt_path:
             print("Load first Checkpoint: {}".format(ckpt_path))
             ckpt = torch.load(ckpt_path, map_location="cpu")
