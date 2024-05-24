@@ -96,15 +96,16 @@ The following checkpoints are the full weights (visual encoder + audio encoder +
 ## Usage
 #### Environment Preparation 
 
-First, install ffmpeg.
-```
-apt update
-apt install ffmpeg
-```
-Then, create a conda environment:
+First, create a conda environment:
 ```
 conda env create -f environment.yml
 conda activate videollama
+```
+Second, install `ffmpeg` and `ffmpeg-python`.
+```
+apt update
+apt install ffmpeg
+pip install ffmpeg-python
 ```
 
 
