@@ -18,7 +18,7 @@ This is the repo for the Video-LLaMA project, which is working on empowering lar
 </div>
 
 ## News
-- [2024.06.03] 🚀🚀 We officially launch [VideoLLaMA2](https://github.com/DAMO-NLP-SG/VideoLLaMA2) with stronger performances and easier-to-use codebase, come to try it out! 
+- <h3> [2024.06.03] 🚀🚀 We officially launch <a href='https://github.com/DAMO-NLP-SG/VideoLLaMA2'>VideoLLaMA2</a> with stronger performances and easier-to-use codebase, come to try it out!</h3>
 - [11.14] ⭐️ The current README file is for **Video-LLaMA-2** (LLaMA-2-Chat as language decoder) only, instructions for using the previous version of Video-LLaMA (Vicuna as language decoder) can be found at [here](https://github.com/DAMO-NLP-SG/Video-LLaMA/blob/main/README_Vicuna.md).
 - [08.03] 🚀🚀 Release **Video-LLaMA-2** with [Llama-2-7B/13B-Chat](https://huggingface.co/meta-llama) as language decoder
     - **NO** delta weights and separate Q-former weights anymore, full weights to run Video-LLaMA are all here :point_right: [[7B](https://huggingface.co/DAMO-NLP-SG/Video-LLaMA-2-7B-Finetuned)][[13B](https://huggingface.co/DAMO-NLP-SG/Video-LLaMA-2-13B-Finetuned)] 
