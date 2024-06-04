@@ -10,6 +10,7 @@ import os
 import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM, LlamaTokenizer
 from transformers import StoppingCriteria, StoppingCriteriaList
+import ffmpeg
 
 import dataclasses
 from enum import auto, Enum
@@ -252,7 +253,9 @@ class Chat:
         
         try:
             audio_flag = 1
-            audio = load_and_transform_audio_data([video_path],"cpu",  clips_per_video=8)
+            audio_path = video_path[:-3] + 'wav'
+            ffmpeg.input(video_path).output(audio_path).run(overwrite_output=True, quiet=True)
+            audio = load_and_transform_audio_data([audio_path],"cpu",  clips_per_video=8)
             audio = audio.to(self.device)
         except :
             print('no audio is found')
